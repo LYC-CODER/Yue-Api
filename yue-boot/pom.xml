@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.lycorder</groupId>
+        <artifactId>Yue-Api</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>yue-boot</artifactId>
+
+    <dependencies>
+        <!-- 装配全部业务模块 -->
+        <dependency>
+            <groupId>com.lycorder</groupId>
+            <artifactId>yue-auth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lycorder</groupId>
+            <artifactId>yue-system</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lycorder</groupId>
+            <artifactId>yue-platform</artifactId>
+        </dependency>
+
+        <!--spring test-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>yue-api</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

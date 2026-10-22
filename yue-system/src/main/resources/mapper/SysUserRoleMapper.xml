@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lycorder.system.mapper.SysUserRoleMapper">
+
+    <resultMap id="BaseResultMap" type="com.lycorder.system.model.entity.SysUserRole">
+            <id property="userId" column="user_id" jdbcType="BIGINT"/>
+            <id property="roleId" column="role_id" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        user_id,role_id
+    </sql>
+
+    <!-- 根据用户ID获取角色ID集合 -->
+    <select id="listRoleIdsByUserId" resultType="java.lang.Long">
+        SELECT
+            role_id
+        FROM
+            sys_user_role
+        WHERE
+            user_id = #{userId}
+    </select>
+
+    <!-- 根据角色ID获取用户数量 -->
+    <select id="countUsersByRoleId" resultType="java.lang.Integer" parameterType="java.lang.Long">
+        SELECT
+            count(*)
+        FROM
+            sys_user_role t1
+                INNER JOIN sys_role t2 ON t1.role_id = t2.id AND t2.is_deleted = 0
+                INNER JOIN sys_user t3 ON t1.user_id = t3.id
+                AND t3.is_deleted = 0
+        WHERE
+            t1.role_id = #{roleId}
+    </select>
+</mapper>

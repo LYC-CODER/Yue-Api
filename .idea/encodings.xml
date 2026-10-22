@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-auth/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-boot/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-boot/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-platform/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-platform/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-plugin/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-plugin/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-security/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-security/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-system/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/yue-system/src/main/resources" charset="UTF-8" />
+  </component>
+</project>

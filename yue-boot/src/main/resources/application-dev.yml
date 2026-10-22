@@ -1,0 +1,156 @@
+# 服务端配置
+server:
+  # 服务运行端口号
+  port: 9980
+
+# Mybatis-Plus 配置
+mybatis-plus:
+  configuration:
+    # 配置标准输出日志实现（用于查看SQL日志）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-value: is_deleted
+
+# Spring 应用配置
+spring:
+  # 数据源配置
+  datasource:
+    # JDBC驱动类名
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 数据库连接URL（包含字符集、SSL等参数）
+    url: jdbc:mysql://192.168.49.171:3306/real_time_api?characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true
+    # 数据库用户名
+    username: root
+    # 数据库密码
+    password: 123456
+  # Redis配置
+  data:
+    redis:
+      # Redis连接信息
+      host: 192.168.49.171
+      port: 6379
+#      password: 123456
+
+  # 应用启动Banner配置
+  banner:
+    charset: utf-8
+    location: banner.txt
+
+  cache:
+    enabled: false
+    # 缓存类型 redis、none(不使用缓存)
+    type: redis
+    # 缓存时间(单位：ms)
+    redis:
+      time-to-live: 3600000
+      # 缓存null值，防止缓存穿透
+      cache-null-values: true
+    caffeine:
+      spec: initialCapacity=50,maximumSize=1000,expireAfterWrite=600s
+
+# OpenAPI 文档配置
+springdoc:
+  swagger-ui:
+    # Swagger UI访问路径和排序规则
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    # API文档生成路径
+    path: /v3/api-docs
+  group-configs:
+    # 默认分组配置（扫描指定包下的控制器）
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan:
+        - com.lycorder.auth.controller
+        - com.lycorder.system.controller
+        - com.lycorder.platform.file.controller
+        - com.lycorder.platform.realtime.controller
+
+# Knife4j 增强配置
+knife4j:
+  # 启用Knife4j增强功能
+  enable: false
+  # 生产环境开关（false表示启用文档）
+  production: false
+  setting:
+    # 设置文档界面语言为中文
+    language: zh_cn
+
+# 验证码配置
+captcha:
+  # 验证码类型 circle-圆圈干扰验证码|gif-Gif验证码|line-干扰线验证码|shear-扭曲干扰验证码
+  type: circle
+  # 验证码宽度
+  width: 120
+  # 验证码高度
+  height: 40
+  # 验证码干扰元素个数
+  interfere-count: 2
+  # 文本透明度(0.0-1.0)
+  text-alpha: 0.8
+  # 验证码字符配置
+  code:
+    # 验证码字符类型 math-算术|random-随机字符
+    type: math
+    # 验证码字符长度，type=算术时，表示运算位数(1:个位数运算 2:十位数运算)；type=随机字符时，表示字符个数
+    length: 1
+  # 验证码字体
+  font:
+    # 字体名称 Dialog|DialogInput|Monospaced|Serif|SansSerif
+    name: SansSerif
+    # 字体样式 0-普通|1-粗体|2-斜体
+    weight: 1
+    # 字体大小
+    size: 24
+  # 验证码有效期(秒)
+  expire-seconds: 120
+
+# 安全配置
+security:
+  session:
+    type: jwt # 会话方式 [jwt|redis-token]
+    access-token-time-to-live: 7200   # 访问令牌 有效期(单位：秒)，默认 2 小时，-1 表示永不过期
+    refresh-token-time-to-live: 604800   # 刷新令牌有效期(单位：秒)，默认 7 天，-1 表示永不过期
+    jwt:
+      secret-key: SecretKey012345678901234567890123456789012345678901234567890123456789 # JWT密钥(HS256算法至少32字符)
+    redis-token:
+      allow-multi-login: true # 是否允许多设备登录
+  # 安全白名单路径，仅跳过 AuthorizationFilter 过滤器，还是会走 Spring Security 的其他过滤器(CSRF、CORS等)
+  ignore-urls:
+    - /api/v1/auth/login/**       # 登录接口(账号密码登录、手机验证码登录和微信登录)
+    - /api/v1/auth/captcha        # 验证码获取接口
+    - /api/v1/auth/refresh-token  # 刷新令牌接口
+    - /api/v1/auth/wx/miniapp/code-login # 微信小程序code登陆
+    - /ws/**                      # WebSocket接口
+  # 非安全端点路径，完全绕过 Spring Security 的过滤器
+  unsecured-urls:
+    - ${springdoc.swagger-ui.path}
+    - /doc.html
+    - /swagger-ui/**
+    - /v3/api-docs/**
+    - /webjars/**
+    - /favicon.ico
+
+# 文件存储配置
+oss:
+  # OSS 类型 (目前支持minio)
+  type: minio
+  # MinIO 对象存储服务
+  minio:
+    # 服务Endpoint
+    endpoint: http://192.168.49.171:9010
+    # 访问凭据
+    access-key: LYCoder
+    # 凭据密钥
+    secret-key: 293814.Lyc
+    # 存储桶名称
+    bucket-name: real-time-api
+    # (可选)自定义域名，如果配置了域名，生成的文件URL是域名格式，未配置则URL则是IP格式 (eg: https://www.youlai.tech/storage)
+    custom-domain:
+  local:
+    # 文件存储路径 请注意下，mac用户请使用 /Users/your-username/your-path/，否则会有权限问题，windows用户请使用 D:/your-path/
+    storage-path: D:/graduationProject/Real-Time-Api
