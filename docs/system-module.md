@@ -1,8 +1,11 @@
 # 系统管理模块功能说明文档
 
+> 当前实现说明：后端接口统一前缀为 `/api/v1`，例如用户接口是 `/api/v1/users`，通知公告是 `/api/v1/notices`，系统配置是 `/api/v1/configs`。  
+> 文档中较早出现的 `/api/system/*` 路径属于历史设计示例，实际调用请以控制器代码和 Knife4j `/doc.html` 为准。
+
 ## 模块概述
 
-系统管理模块是Real-Time-Api项目的核心管理功能集合，提供了用户管理、角色管理、菜单管理、部门管理等基础系统功能。该模块采用RBAC（Role-Based Access Control）权限模型，支持灵活的角色权限配置和数据权限控制。
+系统管理模块是Real-Time-Api项目的核心管理功能集合，提供了用户管理、角色管理、菜单管理、部门管理、字典管理、通知公告、系统配置等基础系统功能。该模块采用RBAC（Role-Based Access Control）权限模型，支持灵活的角色权限配置和数据权限控制。
 
 ## 功能架构
 
@@ -180,42 +183,135 @@ public Result<List<DictDataVO>> getDictData(@PathVariable String dictType) {
 }
 ```
 
-### 7. 参数设置
+### 7. 系统配置
 
 #### 7.1 功能列表
-- 系统参数配置
-- 参数分组管理
-- 参数缓存
+- 系统配置分页查询
+- 按配置名称 / 配置 key 搜索
+- 新增、编辑、删除配置
+- 配置 key 唯一校验
+- 配置值维护
 
-#### 7.2 参数配置示例
-```yaml
-# 系统参数
-sys.user.initPassword: 123456
-sys.user.maxRetry: 5
-sys.file.maxSize: 10MB
-sys.sms.expire: 300
+#### 7.2 配置实体
+
+```java
+@TableName("sys_config")
+public class SysConfig extends BaseEntity {
+    private String configName;   // 配置名称
+    private String configKey;    // 配置 key，全局唯一
+    private String configValue;  // 配置值
+    private String remark;       // 备注
+    private Long createBy;       // 创建人
+    private Long updateBy;       // 更新人
+    private Integer isDeleted;   // 逻辑删除
+}
 ```
+
+#### 7.3 接口
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/api/v1/configs` | 配置分页 |
+| GET | `/api/v1/configs/{id}/form` | 编辑表单 |
+| POST | `/api/v1/configs` | 新增 |
+| PUT | `/api/v1/configs/{id}` | 修改 |
+| DELETE | `/api/v1/configs/{ids}` | 批量删除 |
+
+权限标识：
+
+```text
+sys:config:list
+sys:config:create
+sys:config:update
+sys:config:delete
+```
+
+初始化脚本：
+
+```text
+docs/sql/config-menu.sql
+```
+
+---
 
 ### 8. 通知公告
 
 #### 8.1 功能列表
-- 公告发布
-- 公告分类
-- 已读未读状态
-- 公告推送
+- 通知公告分页、新增、编辑、删除
+- 发布、撤回
+- 全体用户 / 指定用户
+- 用户通知已读、未读
+- 全部已读
+- 顶栏未读数量
 
-#### 8.2 公告实体
-```java
-public class Notice extends BaseEntity {
-    private Long noticeId;      // 公告ID
-    private String title;       // 标题
-    private Integer type;       // 类型（1-通知，2-公告）
-    private String content;     // 内容
-    private Integer status;     // 状态
-    private Long senderId;      // 发布人
-    private LocalDateTime sendTime;  // 发布时间
-}
+#### 8.2 表结构
+
+`sys_notice` 通知主表：
+
+```text
+id, title, content, type, level, target_type,
+target_user_ids, publisher_id, publish_status,
+publish_time, revoke_time, create_by,
+create_time, update_by, update_time, is_deleted
 ```
+
+`sys_user_notice` 用户接收状态表：
+
+```text
+id, notice_id, user_id, is_read, read_time,
+create_time, update_time, is_deleted
+```
+
+发布状态：
+
+```text
+0  = 未发布
+1  = 已发布
+-1 = 已撤回
+```
+
+目标类型：
+
+```text
+1 = 全体用户
+2 = 指定用户
+```
+
+#### 8.3 接口
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/api/v1/notices` | 管理端分页 |
+| POST | `/api/v1/notices` | 新增 |
+| GET | `/api/v1/notices/{id}/form` | 编辑表单 |
+| PUT | `/api/v1/notices/{id}` | 修改 |
+| DELETE | `/api/v1/notices/{ids}` | 批量删除 |
+| PUT | `/api/v1/notices/{id}/publish` | 发布 |
+| PUT | `/api/v1/notices/{id}/revoke` | 撤回 |
+| GET | `/api/v1/notices/{id}/detail` | 管理端详情 |
+| GET | `/api/v1/notices/my` | 我的通知 |
+| GET | `/api/v1/notices/my/{id}` | 阅读详情并标记已读 |
+| PUT | `/api/v1/notices/read-all` | 全部已读 |
+| GET | `/api/v1/notices/unread-count` | 未读数量 |
+
+权限标识：
+
+```text
+sys:notice:list
+sys:notice:create
+sys:notice:update
+sys:notice:delete
+sys:notice:publish
+sys:notice:revoke
+```
+
+初始化脚本：
+
+```text
+docs/sql/notice-menu.sql
+```
+
+详细说明见项目根目录 `Yue-通知公告功能说明.md`。
 
 ## 数据权限控制
 
@@ -265,43 +361,79 @@ wrapper.like(StringUtils.isNotBlank(username), User::getUsername, username)
 ## API接口列表
 
 ### 用户管理
-- `GET /api/system/user/page` - 分页查询用户
-- `GET /api/system/user/{id}` - 获取用户详情
-- `POST /api/system/user` - 新增用户
-- `PUT /api/system/user` - 更新用户
-- `DELETE /api/system/user/{ids}` - 删除用户
-- `PUT /api/system/user/status` - 修改用户状态
-- `PUT /api/system/user/reset-pwd` - 重置密码
-- `POST /api/system/user/import` - 导入用户
-- `GET /api/system/user/export` - 导出用户
+- `GET /api/v1/users/list` - 用户分页/列表
+- `GET /api/v1/users/{userId}/form` - 用户表单
+- `POST /api/v1/users/saveUser` - 新增用户
+- `PUT /api/v1/users/{userId}` - 更新用户
+- `DELETE /api/v1/users/{ids}` - 删除用户
+- `PUT /api/v1/users/{userId}/password/reset` - 管理员重置密码
+- `GET /api/v1/users/me` - 当前用户信息
+- `GET /api/v1/users/options` - 用户下拉选项
+- `POST /api/v1/users/import` - 导入用户
+- `GET /api/v1/users/export` - 导出用户
+- `GET /api/v1/users/template` - 下载导入模板
 
 ### 角色管理
-- `GET /api/system/role/page` - 分页查询角色
-- `GET /api/system/role/{id}` - 获取角色详情
-- `POST /api/system/role` - 新增角色
-- `PUT /api/system/role` - 更新角色
-- `DELETE /api/system/role/{ids}` - 删除角色
-- `GET /api/system/role/menu/{roleId}` - 获取角色菜单
-- `POST /api/system/role/menu` - 保存角色菜单
-- `GET /api/system/role/dept/{roleId}` - 获取角色数据权限
-- `POST /api/system/role/dept` - 保存角色数据权限
+- `GET /api/v1/roles` - 角色分页
+- `GET /api/v1/roles/options` - 角色下拉选项
+- `POST /api/v1/roles` - 新增角色
+- `GET /api/v1/roles/{roleId}/form` - 角色表单
+- `PUT /api/v1/roles/{id}` - 更新角色
+- `DELETE /api/v1/roles/{ids}` - 删除角色
+- `PUT /api/v1/roles/{roleId}/status` - 修改角色状态
+- `GET /api/v1/roles/{roleId}/menuIds` - 获取角色菜单
+- `PUT /api/v1/roles/{roleId}/menus` - 保存角色菜单
 
 ### 菜单管理
-- `GET /api/system/menu/list` - 获取菜单列表
-- `GET /api/system/menu/tree` - 获取菜单树
-- `GET /api/system/menu/routes` - 获取路由信息
-- `GET /api/system/menu/{id}` - 获取菜单详情
-- `POST /api/system/menu` - 新增菜单
-- `PUT /api/system/menu` - 更新菜单
-- `DELETE /api/system/menu/{id}` - 删除菜单
+- `GET /api/v1/menus` - 获取菜单列表
+- `GET /api/v1/menus/options` - 菜单下拉选项
+- `GET /api/v1/menus/routes` - 获取当前用户路由
+- `GET /api/v1/menus/{id}/form` - 获取菜单表单
+- `POST /api/v1/menus` - 新增菜单
+- `PUT /api/v1/menus/{id}` - 更新菜单
+- `DELETE /api/v1/menus/{id}` - 删除菜单
 
 ### 部门管理
-- `GET /api/system/dept/list` - 获取部门列表
-- `GET /api/system/dept/tree` - 获取部门树
-- `GET /api/system/dept/{id}` - 获取部门详情
-- `POST /api/system/dept` - 新增部门
-- `PUT /api/system/dept` - 更新部门
-- `DELETE /api/system/dept/{id}` - 删除部门
+- `GET /api/v1/depts` - 获取部门列表
+- `GET /api/v1/depts/options` - 获取部门下拉选项
+- `POST /api/v1/depts` - 新增部门
+- `GET /api/v1/depts/{id}/form` - 获取部门表单
+- `PUT /api/v1/depts/{id}` - 更新部门
+- `DELETE /api/v1/depts/{ids}` - 删除部门
+
+### 字典管理
+- `GET /api/v1/dicts` - 字典分页
+- `GET /api/v1/dicts/options` - 字典下拉选项
+- `POST /api/v1/dicts` - 新增字典
+- `GET /api/v1/dicts/{id}/form` - 字典表单
+- `PUT /api/v1/dicts/{id}` - 更新字典
+- `DELETE /api/v1/dicts/{ids}` - 删除字典
+- `GET /api/v1/dicts/{dictCode}/items` - 字典项分页
+- `GET /api/v1/dicts/{dictCode}/items/options` - 字典项选项
+- `POST /api/v1/dicts/{dictCode}/items` - 新增字典项
+- `PUT /api/v1/dicts/{dictCode}/items/{itemId}` - 更新字典项
+- `DELETE /api/v1/dicts/{dictCode}/items/{itemIds}` - 删除字典项
+
+### 通知公告
+- `GET /api/v1/notices` - 管理端分页
+- `POST /api/v1/notices` - 新增
+- `GET /api/v1/notices/{id}/form` - 编辑表单
+- `PUT /api/v1/notices/{id}` - 修改
+- `DELETE /api/v1/notices/{ids}` - 批量删除
+- `PUT /api/v1/notices/{id}/publish` - 发布
+- `PUT /api/v1/notices/{id}/revoke` - 撤回
+- `GET /api/v1/notices/{id}/detail` - 管理端详情
+- `GET /api/v1/notices/my` - 我的通知
+- `GET /api/v1/notices/my/{id}` - 阅读并标记已读
+- `PUT /api/v1/notices/read-all` - 全部已读
+- `GET /api/v1/notices/unread-count` - 未读数量
+
+### 系统配置
+- `GET /api/v1/configs` - 配置分页
+- `GET /api/v1/configs/{id}/form` - 配置表单
+- `POST /api/v1/configs` - 新增配置
+- `PUT /api/v1/configs/{id}` - 修改配置
+- `DELETE /api/v1/configs/{ids}` - 删除配置
 
 ## 扩展功能
 

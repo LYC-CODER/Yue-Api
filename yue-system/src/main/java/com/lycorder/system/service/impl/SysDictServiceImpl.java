@@ -39,6 +39,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
      * 字典分页列表
      *
      * @param queryParams 分页查询对象
+     * @return 字典分页数据
      */
     @Override
     public Page<DictPageVO> getDictPage(DictQuery queryParams) {
@@ -70,6 +71,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
      * 获取字典表单详情
      *
      * @param id 字典ID
+     * @return 字典表单数据
      */
     @Override
     public DictForm getDictForm(Long id) {
@@ -82,6 +84,12 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
         return sysDictConverter.toForm(entity);
     }
 
+    /**
+     * 新增字典，并校验字典编码唯一性。
+     *
+     * @param dictForm 字典表单数据
+     * @return 是否保存成功
+     */
     @Override
     public boolean saveDict(DictForm dictForm) {
 
@@ -100,6 +108,13 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
         return this.save(entity);
     }
 
+    /**
+     * 修改字典，并同步更新其下字典项的字典编码。
+     *
+     * @param id       字典ID
+     * @param dictForm 字典表单数据
+     * @return 是否修改成功
+     */
     @Override
     public boolean updateDict(Long id, DictForm dictForm) {
 
@@ -140,12 +155,23 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
         return result;
     }
 
+    /**
+     * 根据字典ID集合查询字典编码集合。
+     *
+     * @param ids 字典ID列表
+     * @return 字典编码列表
+     */
     @Override
     public List<String> getDictCodesByIds(List<String> ids) {
         List<SysDict> dictList = this.listByIds(ids);
         return dictList.stream().map(SysDict::getDictCode).toList();
     }
 
+    /**
+     * 批量删除字典，并级联清理其下字典项。
+     *
+     * @param ids 字典ID列表
+     */
     @Transactional
     @Override
     public void deleteDictByIds(List<String> ids) {

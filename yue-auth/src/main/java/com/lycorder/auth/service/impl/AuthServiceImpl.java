@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * @package: com.lycorder.service.impl
  * @className: AuthServiceImpl
  * @author: LYCorder
- * @description: TODO
+ * @description: 认证服务实现，负责图形验证码生成、登录认证、退出登录及令牌刷新
  * @date: 2026/3/6 17:16
  * @version: 1.0
  */
@@ -50,8 +50,15 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
 
 
+    /**
+     * 生成图形验证码，并将验证码文本按标识缓存至 Redis 供登录时校验。
+     *
+     * @return 验证码缓存标识与图片 Base64 数据
+     * @throws IllegalArgumentException 当配置的验证码类型不受支持时抛出
+     */
     @Override
     public CaptchaVO getCaptcha() {
+        // 读取验证码样式、尺寸、干扰线数量及字符长度等配置
         String captchaType = captchaProperties.getType();
         int width = captchaProperties.getWidth();
         int height = captchaProperties.getHeight();
@@ -59,6 +66,7 @@ public class AuthServiceImpl implements AuthService {
         int codeLength = captchaProperties.getCode().getLength();
 
         AbstractCaptcha captcha;
+        // 根据配置的验证码类型创建对应的 Hutool 验证码实例
         if (CaptchaTypeEnum.CIRCLE.name().equalsIgnoreCase(captchaType)) {
             captcha = CaptchaUtil.createCircleCaptcha(width, height, codeLength, interfereCount);
         } else if (CaptchaTypeEnum.GIF.name().equalsIgnoreCase(captchaType)) {
@@ -78,6 +86,7 @@ public class AuthServiceImpl implements AuthService {
         String imageBase64Data = captcha.getImageBase64Data();
 
         // 验证码文本缓存至Redis，用于登录校验
+        // 生成一次性验证码标识，作为 Redis 缓存键的一部分返回给前端
         String captchaId = IdUtil.fastSimpleUUID();
         redisTemplate.opsForValue().set(
                 StrUtil.format(RedisConstants.Captcha.IMAGE_CODE, captchaId),
@@ -92,20 +101,34 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+    /**
+     * 校验用户名和密码并签发认证令牌。
+     *
+     * @param username 用户名，处理前会去除首尾空白
+     * @param password 明文密码
+     * @return 认证令牌响应
+     * @throws org.springframework.security.core.AuthenticationException 认证失败时抛出
+     */
     @Override
     public AuthenticationToken login(String username, String password) {
+        // 构造用户名密码认证请求，交由 Spring Security 的认证管理器校验
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(username.trim(), password);
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        // 认证成功后签发令牌，并写入安全上下文供后续业务读取当前登录用户
         AuthenticationToken authenticationTokenResponse =
                 tokenManager.generateToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return authenticationTokenResponse;
     }
 
+    /**
+     * 注销当前访问令牌并清空安全上下文。
+     */
     @Override
     public void logout() {
         String token = SecurityUtils.getAccessToken();
+        // 仅当请求携带非空令牌时才执行注销，避免无意义的上下文清理
         if (StrUtil.isNotBlank(token)) {
             tokenManager.invalidateToken(token);
             // 清除Security上下文
@@ -113,6 +136,13 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * 使用刷新令牌换取新的访问令牌。
+     *
+     * @param refreshToken 刷新令牌
+     * @return 新的认证令牌响应
+     * @throws com.lycorder.core.exception.BusinessException 刷新令牌无效或已过期时抛出
+     */
     @Override
     public AuthenticationToken refreshToken(String refreshToken) {
         return tokenManager.refreshToken(refreshToken);

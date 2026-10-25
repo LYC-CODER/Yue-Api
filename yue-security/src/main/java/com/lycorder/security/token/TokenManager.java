@@ -6,9 +6,10 @@ import com.lycorder.security.model.AuthenticationToken;
 import org.springframework.security.core.Authentication;
 
 /**
- *  Token 管理器
- *  <p>
- *  用于生成、解析、校验、刷新 Token
+ * Token 管理器。
+ * <p>
+ * 定义令牌生成、解析、校验、刷新与失效能力；具体实现由 {@code security.session.type}
+ * 配置选择 JWT 或 Redis Token 模式。
  *
  * @author LYCoder
  */
@@ -33,7 +34,7 @@ public interface TokenManager {
     /**
      * 校验 Token 是否有效
      *
-     * @param token JWT Token
+     * @param token 待校验的访问令牌
      * @return 是否有效
      */
     boolean validateToken(String token);
@@ -41,7 +42,7 @@ public interface TokenManager {
     /**
      * 校验 刷新 Token 是否有效
      *
-     * @param refreshToken JWT Token
+     * @param refreshToken 待校验的刷新令牌
      * @return 是否有效
      */
     boolean validateRefreshToken(String refreshToken);
@@ -55,9 +56,11 @@ public interface TokenManager {
     AuthenticationToken refreshToken(String token);
 
     /**
-     * 令 Token 失效
+     * 使单个 Token 失效。
+     * <p>
+     * 默认空实现，支持黑名单或会话存储的实现应覆盖此方法。
      *
-     * @param token Token
+     * @param token 待失效的 Token
      */
     default void invalidateToken(String token) {
         // 默认实现可以是空的，或者抛出不支持的操作异常

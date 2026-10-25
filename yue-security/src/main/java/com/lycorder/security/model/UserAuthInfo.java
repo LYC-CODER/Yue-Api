@@ -8,6 +8,7 @@ import java.util.Set;
  * 用户认证信息
  * <p>
  * 用于登录认证过程中的用户信息承载，包含用户名、密码、状态、角色等与认证/授权相关的数据。
+ * 认证成功后会被转换为 {@link SysUserDetails}，供 Spring Security 使用。
  * </p>
  *
  * @author LYCoder

@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
  * <p>
  * 用于在过滤器、Security处理器等无法使用 @RestControllerAdvice 的场景中统一写入HTTP响应。
  * 支持写入成功响应和错误响应。
+ * 错误响应会按业务码映射 HTTP 状态码（401/400），响应体中仍保留完整业务码。
  * 此类为工具类，所有方法均为静态方法，禁止实例化。
  *
  * @author LYCoder
@@ -69,6 +70,7 @@ public final class WebResponseWriter {
                 ? Result.failed(resultCode)
                 : Result.failed(resultCode, message);
         
+        // 根据业务码确定 HTTP 状态码，响应体仍保留完整业务信息
         int httpStatus = mapHttpStatus(resultCode);
         writeResult(response, result, httpStatus);
     }
@@ -108,6 +110,7 @@ public final class WebResponseWriter {
      */
     private static int mapHttpStatus(ResultCode resultCode) {
         return switch (resultCode) {
+            // 认证/令牌类错误映射为 401，其余业务错误统一为 400
             case ACCESS_UNAUTHORIZED,
                     ACCESS_TOKEN_INVALID,
                     REFRESH_TOKEN_INVALID -> HttpStatus.UNAUTHORIZED.value();

@@ -61,10 +61,10 @@ public interface SysDictService extends IService<SysDict> {
     boolean updateDict(Long id, DictForm dictForm);
 
     /**
-     * 获取字典项列表
+     * 根据字典ID集合获取字典编码集合
      *
      * @param ids 字典ID列表
-     * @return 字典项列表
+     * @return 字典编码列表
      */
     List<String> getDictCodesByIds(List<String> ids);
 

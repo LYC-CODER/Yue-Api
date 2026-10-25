@@ -12,7 +12,9 @@ import org.springframework.context.annotation.Configuration;
 import java.awt.*;
 
 /**
- * 验证码自动装配配置
+ * 验证码自动装配配置。
+ * <p>
+ * 依据验证码配置项装配字符生成器与字体，供验证码服务生成图片时使用。
  *
  * @author LYCoder
  */
@@ -36,6 +38,7 @@ public class CaptchaConfig {
     public CodeGenerator codeGenerator() {
         String codeType = captchaProperties.getCode().getType();
         int codeLength = captchaProperties.getCode().getLength();
+        // 按配置选择算术表达式或随机字符生成器，未知类型直接拒绝启动
         if ("math".equalsIgnoreCase(codeType)) {
             return new MathGenerator(codeLength, false);
         } else if ("random".equalsIgnoreCase(codeType)) {
@@ -59,6 +62,7 @@ public class CaptchaConfig {
         String fontName = captchaProperties.getFont().getName();
         int fontSize = captchaProperties.getFont().getSize();
         int fontWight = captchaProperties.getFont().getWeight();
+        // 字体名称、样式和字号均来自外部配置
         return new Font(fontName, fontWight, fontSize);
     }
 

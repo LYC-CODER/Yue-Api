@@ -1,0 +1,111 @@
+# 生产环境配置
+# 所有敏感信息通过环境变量注入，禁止在仓库中写死密码/密钥。
+server:
+  port: ${SERVER_PORT:9980}
+
+mybatis-plus:
+  configuration:
+    # 生产环境不打印 SQL
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-value: is_deleted
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+  banner:
+    charset: utf-8
+    location: banner.txt
+  cache:
+    enabled: false
+    type: redis
+    redis:
+      time-to-live: 3600000
+      cache-null-values: true
+    caffeine:
+      spec: initialCapacity=50,maximumSize=1000,expireAfterWrite=600s
+
+springdoc:
+  swagger-ui:
+    # Knife4j 使用 /doc.html，springdoc 自身保留默认 /swagger-ui.html
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan:
+        - com.lycorder.auth.controller
+        - com.lycorder.system.controller
+        - com.lycorder.platform.file.controller
+
+# Knife4j 静态 UI；生产环境保持 enable=false，避免增强配置兼容问题
+knife4j:
+  enable: false
+  production: ${KNIFE4J_PRODUCTION:false}
+  setting:
+    language: zh_cn
+
+captcha:
+  type: circle
+  width: 120
+  height: 40
+  interfere-count: 2
+  text-alpha: 0.8
+  code:
+    type: math
+    length: 2
+  font:
+    name: SansSerif
+    weight: 1
+    size: 24
+  expire-seconds: 120
+
+security:
+  session:
+    type: jwt
+    access-token-time-to-live: ${ACCESS_TOKEN_TTL:7200}
+    refresh-token-time-to-live: ${REFRESH_TOKEN_TTL:604800}
+    jwt:
+      # 必须通过 JWT_SECRET 注入，且长度不少于 32 个字符
+      secret-key: ${JWT_SECRET}
+    redis-token:
+      allow-multi-login: ${ALLOW_MULTI_LOGIN:true}
+  ignore-urls:
+    - /api/v1/auth/login/**
+    - /api/v1/auth/captcha
+    - /api/v1/auth/refresh-token
+    - /ws/**
+  unsecured-urls:
+    - /doc.html
+    - /swagger-ui/**
+    - /v3/api-docs/**
+    - /webjars/**
+    - /favicon.ico
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}
+
+oss:
+  type: ${OSS_TYPE:minio}
+  minio:
+    endpoint: ${MINIO_ENDPOINT}
+    access-key: ${MINIO_ACCESS_KEY}
+    secret-key: ${MINIO_SECRET_KEY}
+    bucket-name: ${MINIO_BUCKET_NAME:real-time-api}
+    custom-domain: ${MINIO_CUSTOM_DOMAIN:}
+  local:
+    storage-path: ${LOCAL_STORAGE_PATH:/data/yue-api/files}

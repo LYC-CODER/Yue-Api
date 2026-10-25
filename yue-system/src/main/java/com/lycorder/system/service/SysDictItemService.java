@@ -29,6 +29,7 @@ public interface SysDictItemService extends IService<SysDictItem> {
     /**
      * 字典项选项列表
      *
+     * @param dictCode 字典编码
      * @return 字典项选项列表
      */
     List<DictItemOptionVO> getDictItems(String dictCode);

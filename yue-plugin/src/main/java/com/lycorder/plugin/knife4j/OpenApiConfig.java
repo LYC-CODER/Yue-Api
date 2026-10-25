@@ -33,8 +33,14 @@ import java.util.stream.Stream;
 @Slf4j
 public class OpenApiConfig {
 
+    /**
+     * 环境配置，用于读取 project.version 等属性
+     */
     private final Environment environment;
 
+    /**
+     * 安全配置，提供免认证放行路径
+     */
     private final SecurityProperties securityProperties;
 
     /**
@@ -88,6 +94,7 @@ public class OpenApiConfig {
     public GlobalOpenApiCustomizer globalOpenApiCustomizer() {
         return openApi -> {
             // 全局添加 Authorization
+            // 未扫描到任何接口路径时直接跳过
             if (openApi.getPaths() != null) {
                 openApi.getPaths().forEach((path, pathItem) -> {
 

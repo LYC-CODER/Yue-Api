@@ -33,6 +33,12 @@ public class IPUtils {
     private static final String DB_PATH = "/data/ip2region.xdb";
     private static Searcher searcher;
 
+    /**
+     * 初始化 IP 地址库。
+     * <p>
+     * 将类路径下的 ip2region.xdb 复制到临时文件后创建 Searcher；
+     * 初始化失败仅记录日志，不阻断应用启动，此时 {@link #getRegion(String)} 返回 null。
+     */
     @PostConstruct
     public void init() {
         try {
@@ -65,6 +71,7 @@ public class IPUtils {
             if (request == null) {
                 return "";
             }
+            // 按常见代理请求头依次尝试，取第一个有效 IP
             ip = request.getHeader("x-forwarded-for");
             if (checkIp(ip)) {
                 ip = request.getHeader("Proxy-Client-IP");
@@ -97,6 +104,12 @@ public class IPUtils {
         return ip;
     }
 
+    /**
+     * 判断请求头中的 IP 是否无效。
+     *
+     * @param ip 请求头中的 IP 值
+     * @return true 表示缺失或为 unknown，需要继续尝试下一个请求头
+     */
     private static boolean checkIp(String ip) {
         String unknown = "unknown";
         return StrUtil.isEmpty(ip) || unknown.equalsIgnoreCase(ip);
@@ -123,6 +136,7 @@ public class IPUtils {
      * @return 地理位置信息
      */
     public static String getRegion(String ip) {
+        // Searcher 为静态共享实例，初始化失败时直接返回空
         if (searcher == null) {
             log.error("Searcher is not initialized");
             return null;

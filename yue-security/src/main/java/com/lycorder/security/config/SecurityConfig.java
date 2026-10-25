@@ -1,7 +1,9 @@
 package com.lycorder.security.config;
 
+import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.util.ArrayUtil;
 import com.lycorder.common.config.property.SecurityProperties;
+import com.lycorder.security.filter.CaptchaValidationFilter;
 import com.lycorder.security.filter.TokenAuthenticationFilter;
 import com.lycorder.security.handler.ApiAccessDeniedHandler;
 import com.lycorder.security.handler.ApiAuthenticationEntryPoint;
@@ -9,6 +11,7 @@ import com.lycorder.security.token.TokenManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -46,12 +49,30 @@ public class SecurityConfig {
      */
     private final UserDetailsService userDetailsService;
 
+    /**
+     * 安全相关配置项，包含放行路径、会话类型等
+     */
     private final SecurityProperties securityProperties;
+    /**
+     * Token 管理器，供 Token 认证过滤器解析和校验令牌
+     */
     private final TokenManager tokenManager;
+    /**
+     * Redis 客户端，供验证码校验过滤器读取验证码缓存
+     */
+    private final RedisTemplate<String, Object> redisTemplate;
+    /**
+     * 验证码字符生成器，用于校验用户提交的验证码文本
+     */
+    private final CodeGenerator codeGenerator;
 
 
     /**
-     * 配置安全过滤链，用于定义哪些请求需要认证或授权
+     * 配置安全过滤链，定义放行路径、认证授权规则、无状态会话以及自定义过滤器顺序。
+     *
+     * @param http Spring Security 的 HTTP 安全构建器
+     * @return 构建完成的安全过滤链
+     * @throws Exception 构建过滤链失败时抛出
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -59,10 +80,12 @@ public class SecurityConfig {
         // 配置认证与授权规则
         return http
                 .authorizeHttpRequests(requestMatcherRegistry -> {
+                            // 加载配置中的免认证路径，未配置时不做放行
                             String[] ignoreUrls = securityProperties.getIgnoreUrls();
                             if (ArrayUtil.isNotEmpty(ignoreUrls)) {
                                 requestMatcherRegistry.requestMatchers(ignoreUrls).permitAll();
                             }
+                            // 除上述放行路径外，其余请求一律要求认证
                             requestMatcherRegistry.anyRequest().authenticated();
                         }
                 )
@@ -82,10 +105,12 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 // 禁用 HTTP Basic 认证（统一使用 JWT 认证）
                 .httpBasic(AbstractHttpConfigurer::disable)
-                // 禁用 X-Frame-Options 响应头，允许页面被嵌套到 iframe 中
-                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                // 验证和解析过滤器
+                // 仅允许同源 iframe（Apidoc 通过前端同源 /doc.html 代理访问），避免点击劫持
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
+                // 验证和解析 Token
                 .addFilterBefore(new TokenAuthenticationFilter(tokenManager), UsernamePasswordAuthenticationFilter.class)
+                // 校验登录接口的图形验证码（必须放在 Token 过滤器之前）
+                .addFilterBefore(new CaptchaValidationFilter(redisTemplate, codeGenerator), TokenAuthenticationFilter.class)
                 .build();
 
     }
@@ -94,10 +119,13 @@ public class SecurityConfig {
      * 配置Web安全自定义器，以忽略特定请求路径的安全性检查。
      * <p>
      * 该配置用于指定哪些请求路径不经过Spring Security过滤器链。通常用于静态资源文件。
+     *
+     * @return Web 安全自定义器
      */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> {
+            // 这些路径完全绕过安全过滤器链，需谨慎配置
             String[] unsecuredUrls = securityProperties.getUnsecuredUrls();
             if (ArrayUtil.isNotEmpty(unsecuredUrls)) {
                 web.ignoring().requestMatchers(unsecuredUrls);
@@ -106,22 +134,29 @@ public class SecurityConfig {
     }
 
     /**
-     * 默认密码认证的 Provider
+     * 创建基于数据库用户信息的密码认证 Provider。
+     *
+     * @return 配置了用户加载服务和密码编码器的认证 Provider
      */
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(userDetailsService);
+        // 指定密码编码器，认证时使用相同算法比对密文
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
         return daoAuthenticationProvider;
     }
 
     /**
-     * 认证管理器
+     * 创建认证管理器。
+     *
+     * @param daoAuthenticationProvider 数据库用户认证 Provider
+     * @return 认证管理器
      */
     @Bean
     public AuthenticationManager authenticationManager(
             DaoAuthenticationProvider daoAuthenticationProvider
     ) {
+        // 当前仅启用数据库认证方式
         return new ProviderManager(
                 daoAuthenticationProvider
         );

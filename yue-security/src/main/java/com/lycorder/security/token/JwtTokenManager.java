@@ -35,9 +35,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * JWT Token 管理器
+ * JWT Token 管理器。
  * <p>
- * 用于生成、解析、校验、刷新 JWT Token
+ * 基于 Hutool JWT 生成、解析、校验和刷新令牌；校验阶段除验签与过期检查外，
+ * 还会结合 Redis 中的用户安全版本号和令牌黑名单判断令牌是否仍然有效。
  *
  * @author LYCoder
  */
@@ -45,10 +46,25 @@ import java.util.stream.Collectors;
 @Service
 public class JwtTokenManager implements TokenManager {
 
+    /**
+     * 安全配置，提供 JWT 密钥及访问/刷新令牌有效期
+     */
     private final SecurityProperties securityProperties;
+    /**
+     * Redis 客户端，用于读取安全版本号和令牌黑名单
+     */
     private final RedisTemplate<String, Object> redisTemplate;
+    /**
+     * JWT 签名与验签密钥
+     */
     private final byte[] secretKey;
 
+    /**
+     * 创建 JWT Token 管理器。
+     *
+     * @param securityProperties 安全配置
+     * @param redisTemplate      Redis 客户端
+     */
     public JwtTokenManager(SecurityProperties securityProperties, RedisTemplate<String, Object> redisTemplate) {
         this.securityProperties = securityProperties;
         this.redisTemplate = redisTemplate;
@@ -86,6 +102,7 @@ public class JwtTokenManager implements TokenManager {
     @Override
     public Authentication parseToken(String token) {
 
+        // 解析 JWT 并从载荷中还原用户身份、部门及数据权限范围
         JWT jwt = JWTUtil.parseToken(token);
         JSONObject payloads = jwt.getPayloads();
         SysUserDetails userDetails = new SysUserDetails();
@@ -222,16 +239,21 @@ public class JwtTokenManager implements TokenManager {
         }
 
         String versionKey = StrUtil.format(RedisConstants.Auth.USER_SECURITY_VERSION, userId);
-        // 递增版本号
+        // 递增版本号，旧版本号签发的令牌会在后续校验中被判定为无效
         redisTemplate.opsForValue().increment(versionKey);
 
     }
 
     /**
-     * 刷新令牌
+     * 刷新令牌。
+     * <p>
+     * 校验刷新令牌有效后重新解析用户身份，同时轮换刷新令牌：
+     * 旧刷新令牌加入黑名单，新刷新令牌继续使用一个完整有效期。
+     * 这样刷新令牌泄露后的可利用窗口不会无限延长。
      *
      * @param refreshToken 刷新令牌
      * @return 令牌响应对象
+     * @throws BusinessException 刷新令牌无效或已过期时抛出
      */
     @Override
     public AuthenticationToken refreshToken(String refreshToken) {
@@ -241,10 +263,17 @@ public class JwtTokenManager implements TokenManager {
         }
         Authentication authentication = parseToken(refreshToken);
         int accessTokenExpiration = securityProperties.getSession().getAccessTokenTimeToLive();
+        int refreshTokenExpiration = securityProperties.getSession().getRefreshTokenTimeToLive();
+
         String newAccessToken = generateToken(authentication, accessTokenExpiration);
+        String newRefreshToken = generateToken(authentication, refreshTokenExpiration, true);
+
+        // 轮换后旧刷新令牌立即失效，防止被重复使用
+        invalidateToken(refreshToken);
+
         return AuthenticationToken.builder()
                 .accessToken(newAccessToken)
-                .refreshToken(refreshToken)
+                .refreshToken(newRefreshToken)
                 .tokenType("Bearer")
                 .expiresIn(accessTokenExpiration)
                 .build();

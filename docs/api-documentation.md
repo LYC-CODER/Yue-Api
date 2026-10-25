@@ -1,5 +1,9 @@
 # API接口文档
 
+> 当前实现说明：本文档早期章节保留了历史设计示例，实际接口统一前缀为 `/api/v1`，成功响应码为 `00000`。  
+> 例如：用户 `/api/v1/users`、通知公告 `/api/v1/notices`、系统配置 `/api/v1/configs`。  
+> 最新接口以控制器代码和 Knife4j `/doc.html` 为准。
+
 ## 概述
 
 本文档详细描述了Real-Time-Api系统的所有RESTful API接口，包括认证授权、系统管理、文件管理等模块的接口定义、请求参数、响应格式等信息。
@@ -9,10 +13,11 @@
 ### 1. 通用规范
 
 #### 1.1 基础URL
+```text
+开发环境：http://localhost:9980
+生产环境：https://your-domain.example.com
 ```
-开发环境：http://localhost:8080
-生产环境：https://api.realtimesystem.com
-```
+> 实际地址以 `application-dev.yml` / `application-prod.yml` 中的 `server.port` 和部署域名为准。
 
 #### 1.2 请求头
 ```http
@@ -25,10 +30,9 @@ X-Requested-With: XMLHttpRequest
 所有接口返回统一格式的JSON数据：
 ```json
 {
-  "code": 200,
-  "msg": "操作成功",
-  "data": {},
-  "timestamp": 1740936000000
+  "code": "00000",
+  "msg": "成功",
+  "data": {}
 }
 ```
 
@@ -57,8 +61,8 @@ X-Requested-With: XMLHttpRequest
 #### 2.2 响应格式
 ```json
 {
-  "code": 200,
-  "msg": "操作成功",
+  "code": "00000",
+  "msg": "成功",
   "data": {
     "total": 100,
     "list": [],
@@ -204,6 +208,39 @@ POST /api/auth/logout
 ```
 
 ## 系统管理API
+
+> 下面是当前实际使用的主要系统管理接口。本文档后续 1-5 小节中的 `/api/system/*` 示例为早期设计，实际调用请使用本表路径。
+
+| 模块 | 方法 | 路径 | 权限 |
+| --- | --- | --- | --- |
+| 用户 | GET | `/api/v1/users/list` | `sys:user:list` |
+| 用户 | POST | `/api/v1/users/saveUser` | `sys:user:create` |
+| 用户 | PUT | `/api/v1/users/{userId}` | `sys:user:update` |
+| 用户 | DELETE | `/api/v1/users/{ids}` | `sys:user:delete` |
+| 用户 | PUT | `/api/v1/users/{userId}/password/reset` | `sys:user:reset-password` |
+| 用户 | POST | `/api/v1/users/import` | `sys:user:import` |
+| 用户 | GET | `/api/v1/users/export` | `sys:user:export` |
+| 角色 | GET | `/api/v1/roles` | `sys:role:list` |
+| 角色 | POST | `/api/v1/roles` | `sys:role:create` |
+| 角色 | PUT | `/api/v1/roles/{id}` | `sys:role:update` |
+| 角色 | DELETE | `/api/v1/roles/{ids}` | `sys:role:delete` |
+| 角色 | GET | `/api/v1/roles/{roleId}/menuIds` | `sys:role:list` |
+| 角色 | PUT | `/api/v1/roles/{roleId}/menus` | `sys:role:update` |
+| 菜单 | GET | `/api/v1/menus` | `sys:menu:list` |
+| 菜单 | GET | `/api/v1/menus/routes` | 登录即可 |
+| 菜单 | POST | `/api/v1/menus` | `sys:menu:create` |
+| 菜单 | PUT | `/api/v1/menus/{id}` | `sys:menu:update` |
+| 菜单 | DELETE | `/api/v1/menus/{id}` | `sys:menu:delete` |
+| 部门 | GET | `/api/v1/depts` | `sys:dept:list` |
+| 部门 | POST | `/api/v1/depts` | `sys:dept:create` |
+| 部门 | PUT | `/api/v1/depts/{deptId}` | `sys:dept:update` |
+| 部门 | DELETE | `/api/v1/depts/{ids}` | `sys:dept:delete` |
+| 字典 | GET | `/api/v1/dicts` | `sys:dict:list` |
+| 字典 | POST | `/api/v1/dicts` | `sys:dict:create` |
+| 字典 | PUT | `/api/v1/dicts/{id}` | `sys:dict:update` |
+| 字典 | DELETE | `/api/v1/dicts/{ids}` | `sys:dict:delete` |
+| 通知 | GET | `/api/v1/notices` | `sys:notice:list` |
+| 配置 | GET | `/api/v1/configs` | `sys:config:list` |
 
 ### 1. 用户管理
 
@@ -652,6 +689,146 @@ GET /api/system/dict/data/list?dictType=sys_user_sex
 }
 ```
 
+### 6. 通知公告
+
+通知公告接口前缀：
+
+```text
+/api/v1/notices
+```
+
+权限标识：
+
+```text
+sys:notice:list
+sys:notice:create
+sys:notice:update
+sys:notice:delete
+sys:notice:publish
+sys:notice:revoke
+```
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/api/v1/notices` | 管理端分页 |
+| POST | `/api/v1/notices` | 新增 |
+| GET | `/api/v1/notices/{id}/form` | 编辑表单 |
+| PUT | `/api/v1/notices/{id}` | 修改 |
+| DELETE | `/api/v1/notices/{ids}` | 批量删除 |
+| PUT | `/api/v1/notices/{id}/publish` | 发布 |
+| PUT | `/api/v1/notices/{id}/revoke` | 撤回 |
+| GET | `/api/v1/notices/{id}/detail` | 管理端详情 |
+| GET | `/api/v1/notices/my` | 我的通知分页 |
+| GET | `/api/v1/notices/my/{id}` | 阅读详情并标记已读 |
+| PUT | `/api/v1/notices/read-all` | 全部已读 |
+| GET | `/api/v1/notices/unread-count` | 未读数量 |
+
+新增请求示例：
+
+```json
+{
+  "title": "系统维护通知",
+  "content": "系统将于今晚 23:00 进行维护。",
+  "type": 1,
+  "level": "M",
+  "targetType": 1,
+  "targetUserIds": []
+}
+```
+
+`targetType`：
+
+```text
+1 = 全体用户
+2 = 指定用户
+```
+
+发布状态：
+
+```text
+0  = 未发布
+1  = 已发布
+-1 = 已撤回
+```
+
+规则：
+
+- 已发布公告不能直接修改，需要先撤回
+- 已发布公告不能直接删除，需要先撤回
+- 全体用户发布按每批 500 个用户写入 `sys_user_notice`
+- 撤回和删除会清理用户接收记录
+
+初始化脚本：
+
+```text
+docs/sql/notice-menu.sql
+```
+
+详细说明：
+
+```text
+Yue-通知公告功能说明.md
+```
+
+### 7. 系统配置
+
+系统配置接口前缀：
+
+```text
+/api/v1/configs
+```
+
+权限标识：
+
+```text
+sys:config:list
+sys:config:create
+sys:config:update
+sys:config:delete
+```
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/api/v1/configs` | 配置分页 |
+| GET | `/api/v1/configs/{id}/form` | 编辑表单 |
+| POST | `/api/v1/configs` | 新增 |
+| PUT | `/api/v1/configs/{id}` | 修改 |
+| DELETE | `/api/v1/configs/{ids}` | 批量删除 |
+
+新增请求示例：
+
+```json
+{
+  "configName": "系统名称",
+  "configKey": "system.name",
+  "configValue": "Yue",
+  "remark": "站点显示名称"
+}
+```
+
+字段限制：
+
+```text
+configName  最长 50
+configKey   最长 50，全局唯一
+configValue 最长 100
+remark      最长 255
+```
+
+`configKey` 只允许字母、数字、点、下划线、短横线。
+
+初始化脚本：
+
+```text
+docs/sql/config-menu.sql
+```
+
+详细说明：
+
+```text
+Yue-系统配置功能说明.md
+```
+
 ## 文件管理API
 
 ### 1. 文件上传
@@ -854,8 +1031,11 @@ GET /api/common/upload/token
 ```
 
 ### 2. 获取系统配置
+当前后端未提供匿名公开配置接口。  
+管理端使用 `/api/v1/configs`（需要 `sys:config:list` 权限）；业务代码可通过 `SysConfigService#getConfigValue(String configKey)` 按 key 读取配置值。
+
 ```http
-GET /api/common/config/{configKey}
+GET /api/v1/configs?pageNum=1&pageSize=10&keywords=system
 ```
 
 ### 3. 获取字典数据
@@ -1022,10 +1202,9 @@ const users = await client.system.getUserPage({ pageNum: 1, pageSize: 10 });
 ## 版本管理
 
 ### 1. 版本控制
-API版本通过URL路径控制：
-```
-/v1/api/...    # 第一版API
-/v2/api/...    # 第二版API
+API版本通过URL路径控制，当前使用：
+```text
+/api/v1/...    # 当前版本
 ```
 
 ### 2. 兼容性策略
@@ -1034,7 +1213,19 @@ API版本通过URL路径控制：
 - 废弃的API会提前通知并保留6个月的过渡期
 
 ### 3. 更新日志
-请关注官方文档获取API更新日志。
+
+#### 2026-10-25
+
+- 新增通知公告模块：
+  - 管理端分页、新增、修改、删除
+  - 发布、撤回
+  - 我的通知、已读、全部已读、未读数量
+  - 初始化脚本：`docs/sql/notice-menu.sql`
+- 新增系统配置模块：
+  - 配置分页、新增、修改、删除
+  - 配置 key 唯一校验
+  - 初始化脚本：`docs/sql/config-menu.sql`
+- 补充通知公告、系统配置接口文档
 
 ## 测试环境
 

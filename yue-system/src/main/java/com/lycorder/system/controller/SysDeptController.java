@@ -20,6 +20,8 @@ import com.lycorder.common.annotation.Log;
 import java.util.List;
 
 /**
+ * 部门管理接口，负责部门树查询、增删改及下拉选项维护。
+ *
  * @projectName: Real-Time-Api
  * @package: com.lycorder.system.controller
  * @className: SysDeptController
@@ -36,6 +38,12 @@ import java.util.List;
 public class SysDeptController {
     private final SysDeptService sysDeptService;
 
+    /**
+     * 查询部门树列表。
+     *
+     * @param queryParams 部门查询参数
+     * @return 部门树列表
+     */
     @Operation(summary = "部门列表")
     @GetMapping
     @Log( value = "部门列表",module = LogModuleEnum.DEPT)
@@ -46,6 +54,11 @@ public class SysDeptController {
         return Result.success(list);
     }
 
+    /**
+     * 获取部门下拉选项。
+     *
+     * @return 部门下拉选项
+     */
     @Operation(summary = "部门下拉列表")
     @GetMapping("/options")
     @Log( value = "部门下拉列表",module = LogModuleEnum.DEPT)
@@ -54,6 +67,12 @@ public class SysDeptController {
         return Result.success(list);
     }
 
+    /**
+     * 新增部门。
+     *
+     * @param formData 部门表单数据
+     * @return 新增部门ID
+     */
     @Operation(summary = "新增部门")
     @PostMapping
     @PreAuthorize("@ss.hasPerm('sys:dept:create')")
@@ -67,6 +86,12 @@ public class SysDeptController {
     }
 
 
+    /**
+     * 获取部门编辑表单数据。
+     *
+     * @param deptId 部门ID
+     * @return 部门表单数据
+     */
     @Operation(summary = "获取部门表单数据")
     @GetMapping("/{deptId}/form")
     @PreAuthorize("@ss.hasPerm('sys:dept:update')")
@@ -77,6 +102,13 @@ public class SysDeptController {
         return Result.success(deptForm);
     }
 
+    /**
+     * 修改部门信息。
+     *
+     * @param deptId   部门ID
+     * @param formData 部门表单数据
+     * @return 修改后的部门ID
+     */
     @Operation(summary = "修改部门")
     @PutMapping(value = "/{deptId}")
     @PreAuthorize("@ss.hasPerm('sys:dept:update')")
@@ -89,6 +121,12 @@ public class SysDeptController {
         return Result.success(deptId);
     }
 
+    /**
+     * 批量删除部门及其子部门。
+     *
+     * @param ids 部门ID字符串，多个以英文逗号分隔
+     * @return 操作结果
+     */
     @Operation(summary = "删除部门")
     @DeleteMapping("/{ids}")
     @PreAuthorize("@ss.hasPerm('sys:dept:delete')")

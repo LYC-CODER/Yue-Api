@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
  * <p>
  * 封装了用户的基本信息和权限信息，供 Spring Security 进行用户认证与授权。
  * 实现了 {@link UserDetails} 接口，提供用户的核心信息。
+ * 用户状态为 1 时视为启用，角色统一添加 {@code ROLE_} 前缀后作为授权信息。
  *
  * @author LYCoder
  */

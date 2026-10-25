@@ -14,7 +14,10 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import java.io.IOException;
 
 /**
- * 统一处理 Spring Security 认证失败响应
+ * 统一处理 Spring Security 认证失败响应。
+ * <p>
+ * 根据异常类型区分账号密码错误、令牌无效以及其他认证异常，并向客户端返回对应的业务错误码。
+ *
  * @author LYCoder
  */
 public class ApiAuthenticationEntryPoint implements AuthenticationEntryPoint {
@@ -25,6 +28,8 @@ public class ApiAuthenticationEntryPoint implements AuthenticationEntryPoint {
      * @param request 触发异常的请求对象（可用于获取请求头、参数等）
      * @param response 响应对象（用于写入错误信息）
      * @param authException 认证异常对象（包含具体失败原因）
+     * @throws IOException 写出响应失败时抛出
+     * @throws ServletException Servlet 处理异常
      */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {

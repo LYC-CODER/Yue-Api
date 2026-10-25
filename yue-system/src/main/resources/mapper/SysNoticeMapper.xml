@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lycorder.system.mapper.SysNoticeMapper">
+
+    <!-- 管理端通知分页 -->
+    <select id="getNoticePage" resultType="com.lycorder.system.model.vo.NoticePageVO">
+        SELECT
+            n.id,
+            n.title,
+            n.type,
+            n.level,
+            n.target_type,
+            n.publish_status,
+            u.nickname AS publisher_name,
+            n.publish_time,
+            n.revoke_time,
+            n.create_time
+        FROM
+            sys_notice n
+            LEFT JOIN sys_user u ON u.id = n.publisher_id AND u.is_deleted = 0
+        WHERE
+            n.is_deleted = 0
+            <if test="queryParams.title != null and queryParams.title != ''">
+                AND n.title LIKE CONCAT('%', #{queryParams.title}, '%')
+            </if>
+            <if test="queryParams.publishStatus != null">
+                AND n.publish_status = #{queryParams.publishStatus}
+            </if>
+            <if test="queryParams.startTime != null and queryParams.startTime != ''">
+                <bind name="startDate"
+                      value="queryParams.startTime.length() == 10 ? queryParams.startTime + ' 00:00:00' : queryParams.startTime"/>
+                AND n.publish_time &gt;= #{startDate}
+            </if>
+            <if test="queryParams.endTime != null and queryParams.endTime != ''">
+                <bind name="endDate"
+                      value="queryParams.endTime.length() == 10 ? queryParams.endTime + ' 23:59:59' : queryParams.endTime"/>
+                AND n.publish_time &lt;= #{endDate}
+            </if>
+        ORDER BY
+            n.publish_time DESC,
+            n.create_time DESC
+    </select>
+
+    <!-- 管理端通知详情 -->
+    <select id="getNoticeDetail" resultType="com.lycorder.system.model.vo.NoticeDetailVO">
+        SELECT
+            n.id,
+            n.title,
+            n.content,
+            n.type,
+            n.level,
+            n.publish_status,
+            u.nickname AS publisher_name,
+            n.publish_time
+        FROM
+            sys_notice n
+            LEFT JOIN sys_user u ON u.id = n.publisher_id AND u.is_deleted = 0
+        WHERE
+            n.id = #{id}
+            AND n.is_deleted = 0
+    </select>
+</mapper>

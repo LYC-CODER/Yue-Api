@@ -12,6 +12,8 @@ import java.util.List;
 
 
 /**
+* 菜单业务接口，负责菜单树、下拉选项、用户路由及菜单维护。
+*
 * @author LYCorder
 * @description 针对表【sys_menu(系统菜单表)】的数据库操作Service
 * @createDate 2026-01-23 19:26:46

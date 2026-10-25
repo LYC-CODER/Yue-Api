@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 import java.util.Set;
 
 /**
- * 在线用户信息对象
+ * 在线用户信息对象。
+ * <p>
+ * 在 Redis Token 模式下缓存当前会话用户的身份、部门、数据权限范围及角色信息，
+ * 令牌解析时据此重建认证对象。
  *
  * @author LYCoder
  */

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * 验证码 属性配置
+ * <p>
+ * 映射 application.yml 中 captcha 前缀，用于图形验证码的生成参数配置。
  *
  * @author LYCoder
  */

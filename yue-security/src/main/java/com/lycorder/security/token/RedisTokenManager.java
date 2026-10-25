@@ -24,9 +24,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * Redis Token 管理器
+ * Redis Token 管理器。
  * <p>
- * 用于生成、解析、校验、刷新 Redis Token
+ * 使用随机 UUID 作为令牌，并将会话用户信息存储在 Redis 中；服务端可通过删除缓存使令牌立即失效，
+ * 同时支持单设备登录控制以及按用户维度注销全部会话。
  *
  * @author LYCoder
  */
@@ -34,9 +35,21 @@ import java.util.stream.Collectors;
 @Service
 public class RedisTokenManager implements TokenManager {
 
+    /**
+     * 安全配置，提供令牌有效期及是否允许多端登录
+     */
     private final SecurityProperties securityProperties;
+    /**
+     * Redis 客户端，用于存储令牌与在线用户信息
+     */
     private final RedisTemplate<String, Object> redisTemplate;
 
+    /**
+     * 创建 Redis Token 管理器。
+     *
+     * @param securityProperties 安全配置
+     * @param redisTemplate      Redis 客户端
+     */
     public RedisTokenManager(SecurityProperties securityProperties, RedisTemplate<String, Object> redisTemplate) {
         this.securityProperties = securityProperties;
         this.redisTemplate = redisTemplate;
@@ -82,7 +95,7 @@ public class RedisTokenManager implements TokenManager {
      * 根据 token 解析用户信息
      *
      * @param token Redis Token
-     * @return 构建的 Authentication 对象
+     * @return 构建的 Authentication 对象；令牌不存在时返回 {@code null}
      */
     @Override
     public Authentication parseToken(String token) {
@@ -120,7 +133,7 @@ public class RedisTokenManager implements TokenManager {
     /**
      * 校验 RefreshToken 是否有效
      *
-     * @param refreshToken 访问令牌
+     * @param refreshToken 刷新令牌
      * @return 是否有效
      */
     @Override
@@ -129,10 +142,13 @@ public class RedisTokenManager implements TokenManager {
     }
 
     /**
-     * 刷新令牌
+     * 刷新令牌。
+     * <p>
+     * 根据刷新令牌取出在线用户信息，删除旧访问令牌后签发并存储新的访问令牌。
      *
      * @param refreshToken 刷新令牌
      * @return 新生成的 AuthenticationToken 对象
+     * @throws BusinessException 刷新令牌不存在或已过期时抛出
      */
     @Override
     public AuthenticationToken refreshToken(String refreshToken) {
@@ -166,6 +182,7 @@ public class RedisTokenManager implements TokenManager {
      */
     @Override
     public void invalidateToken(String token) {
+        // 通过访问令牌反查用户，再按用户维度清理访问与刷新令牌
         Object value = redisTemplate.opsForValue().get(formatTokenKey(token));
         if (value instanceof OnlineUser onlineUser) {
             Long userId = onlineUser.getUserId();
@@ -286,7 +303,7 @@ public class RedisTokenManager implements TokenManager {
     /**
      * 格式化刷新令牌的 Redis 键
      *
-     * @param refreshToken 访问令牌
+     * @param refreshToken 刷新令牌
      * @return 格式化后的 Redis 键
      */
     private String formatRefreshTokenKey(String refreshToken) {

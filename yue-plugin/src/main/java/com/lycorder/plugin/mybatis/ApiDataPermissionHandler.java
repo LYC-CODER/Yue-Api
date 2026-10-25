@@ -17,7 +17,11 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import java.lang.reflect.Method;
 
 /**
- * 数据权限控制器
+ * 数据权限处理器。
+ * <p>
+ * 在 MyBatis-Plus 执行 SQL 前，根据当前登录用户的数据范围动态追加 WHERE 条件；
+ * 仅对标注了 {@link DataPermission} 的 Mapper 方法生效。
+ * </p>
  *
  * @author LYCoder
  */
@@ -25,10 +29,16 @@ import java.lang.reflect.Method;
 public class ApiDataPermissionHandler implements DataPermissionHandler {
 
     /**
-     * 获取数据权限的sql片段
+     * 获取数据权限的 SQL 片段。
+     * <p>
+     * 未登录、超级管理员或数据范围为全部时不限制；Mapper 方法未标注
+     * {@link DataPermission} 时也直接返回原查询条件。
+     * </p>
+     *
      * @param where 查询条件
      * @param mappedStatementId mapper接口方法的全路径
      * @return sql片段
+     * @throws ClassNotFoundException 当 mappedStatementId 对应的 Mapper 接口无法加载时抛出
      */
     @Override
     @SneakyThrows
@@ -50,6 +60,7 @@ public class ApiDataPermissionHandler implements DataPermissionHandler {
         String methodName = mappedStatementId.substring(mappedStatementId.lastIndexOf(StringPool.DOT) + 1);
         // 获取当前执行的接口类里所有的方法
         Method[] methods = clazz.getDeclaredMethods();
+        // 仅按方法名匹配；数据权限场景下 Mapper 方法名应保持唯一，避免重载导致注解读取错误
         for (Method method : methods) {
             //找到当前执行的方法
             if (method.getName().equals(methodName)) {
@@ -65,10 +76,19 @@ public class ApiDataPermissionHandler implements DataPermissionHandler {
     }
 
     /**
-     * 构建过滤条件
+     * 构建数据范围过滤条件。
+     * <p>
+     * 根据数据范围拼接部门或用户字段条件，并与原有 WHERE 条件通过 AND 组合。
+     * </p>
      *
+     * @param deptAlias 部门表别名，可为空
+     * @param deptIdColumnName 部门 ID 字段名
+     * @param userAlias 用户表别名，可为空
+     * @param userIdColumnName 用户 ID 字段名
+     * @param dataScopeEnum 数据范围枚举
      * @param where 当前查询条件
      * @return 构建后查询条件
+     * @throws net.sf.jsqlparser.JSQLParserException 条件表达式解析失败时抛出
      */
     @SneakyThrows
     public static Expression dataScopeFilter(String deptAlias, String deptIdColumnName, String userAlias, String userIdColumnName,DataScopeEnum dataScopeEnum, Expression where) {
@@ -90,7 +110,7 @@ public class ApiDataPermissionHandler implements DataPermissionHandler {
                 userId = SecurityUtils.getUserId();
                 appendSqlStr = userColumnName + StringPool.EQUALS + userId;
                 break;
-            // 默认部门及子部门数据权限
+            // 默认按本部门及子部门过滤；tree_path 保存部门祖先路径，FIND_IN_SET 为 MySQL 语法
             default:
                 deptId = SecurityUtils.getDeptId();
                 appendSqlStr = deptColumnName + " IN ( SELECT id FROM sys_dept WHERE id = " + deptId + " OR FIND_IN_SET( " + deptId + " , tree_path ) )";
@@ -101,8 +121,10 @@ public class ApiDataPermissionHandler implements DataPermissionHandler {
             return where;
         }
 
+        // 把拼接好的条件解析为表达式，再与原 WHERE 条件做 AND 组合
         Expression appendExpression = CCJSqlParserUtil.parseCondExpression(appendSqlStr);
 
+        // 原 SQL 没有 WHERE 条件时，权限条件直接作为查询条件
         if (where == null) {
             return appendExpression;
         }

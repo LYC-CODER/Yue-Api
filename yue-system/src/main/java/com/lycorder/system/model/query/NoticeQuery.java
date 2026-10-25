@@ -5,32 +5,37 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
-
 /**
- * 通知公告查询对象
+ * 通知公告查询参数。
  *
- * @author youlaitech
- * @since 2024-08-27 10:31
+ * @author LYCoder
  */
+@Schema(description = "通知公告查询参数")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Schema(description ="通知公告查询对象")
 public class NoticeQuery extends BaseQuery {
 
+    /** 通知标题（模糊匹配） */
     @Schema(description = "通知标题")
     private String title;
 
-    @Schema(description = "发布状态(0-未发布 1已发布 -1已撤回)")
+    /** 发布状态（0-未发布，1-已发布，-1-已撤回） */
+    @Schema(description = "发布状态")
     private Integer publishStatus;
 
-    @Schema(description = "发布时间(起止)")
-    private List<String> publishTime;
+    /** 发布时间起（yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss） */
+    @Schema(description = "发布时间起")
+    private String startTime;
 
-    @Schema(description = "查询人ID")
+    /** 发布时间止（yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss） */
+    @Schema(description = "发布时间止")
+    private String endTime;
+
+    /** 查询人 ID（我的通知使用，由服务端填充） */
+    @Schema(description = "查询人ID", hidden = true)
     private Long userId;
 
-    @Schema(description = "是否已读（0-未读 1-已读）")
+    /** 是否已读（0-未读，1-已读） */
+    @Schema(description = "是否已读")
     private Integer isRead;
-
 }

@@ -30,7 +30,7 @@
             <version>${mybatis-plus.version}</version>
         </dependency>
 
-        <!--knife4j-->
+        <!-- Knife4j UI；必须关闭 knife4j.enable，避免其增强配置调用 springdoc 2.8 已移除的方法 -->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
@@ -42,6 +42,8 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- OpenAPI / Swagger UI，兼容 Spring Boot 3.5 与 Spring Framework 6.2 -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>

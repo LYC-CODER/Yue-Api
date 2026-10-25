@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
+* 角色菜单关联业务实现，负责权限缓存初始化与刷新。
+*
 * @author LYCorder
 * @description 针对表【sys_role_menu(角色菜单关联表)】的数据库操作Service实现
 * @createDate 2026-01-23 19:26:46
@@ -35,6 +37,7 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
     public void initRolePermsCache() {
         log.info("开始初始化权限缓存...");
 
+        // 启动时将全部角色的权限一次性写入 Redis Hash，减少运行时查库
         List<RolePermsBO> allRolePermsList = this.baseMapper.getRolePermsList(null);
 
         if (CollectionUtil.isEmpty(allRolePermsList)) {

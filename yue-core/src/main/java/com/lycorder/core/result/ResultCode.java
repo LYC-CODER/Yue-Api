@@ -119,6 +119,12 @@ public enum ResultCode implements IResultCode, Serializable {
 
     private final String msg;
 
+    /**
+     * 构造响应码。
+     *
+     * @param code 5 位字符串错误码
+     * @param msg  错误码对应的默认提示
+     */
     ResultCode(String code, String msg) {
         this.code = code;
         this.msg = msg;
@@ -135,6 +141,11 @@ public enum ResultCode implements IResultCode, Serializable {
         return msg;
     }
 
+    /**
+     * 输出便于日志打印的精简 JSON 字符串。
+     *
+     * @return 仅包含 code 与 msg 的 JSON 字符串
+     */
     @Override
     public String toString() {
         return "{" +
@@ -144,7 +155,14 @@ public enum ResultCode implements IResultCode, Serializable {
     }
 
 
+    /**
+     * 根据错误码匹配枚举。
+     *
+     * @param code 5 位字符串错误码
+     * @return 匹配的枚举，未匹配时返回 {@link #SYSTEM_ERROR}
+     */
     public static ResultCode getValue(String code) {
+        // 枚举数量有限，直接线性遍历即可
         for (ResultCode value : values()) {
             if (value.getCode().equals(code)) {
                 return value;

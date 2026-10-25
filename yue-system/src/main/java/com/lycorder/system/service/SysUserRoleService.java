@@ -8,6 +8,8 @@ import java.util.List;
 
 
 /**
+* 用户角色关联业务接口，负责用户角色绑定关系维护。
+*
 * @author LYCorder
 * @description 针对表【sys_user_role(用户角色关联表)】的数据库操作Service
 * @createDate 2026-01-23 19:26:46

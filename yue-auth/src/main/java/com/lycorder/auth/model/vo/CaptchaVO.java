@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * 验证码信息
+ * 验证码信息。
+ * <p>
+ * 返回前端展示验证码图片所需的 Base64 数据，以及登录时用于定位服务端缓存的验证码标识。
  *
  * @author LYCoder
  */

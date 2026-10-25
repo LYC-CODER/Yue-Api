@@ -1,6 +1,5 @@
 package com.lycorder.system.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lycorder.security.token.TokenManager;
@@ -10,12 +9,16 @@ import com.lycorder.system.service.SysUserRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+* 用户角色关联业务实现，负责用户角色绑定及关联校验。
+*
 * @author LYCorder
 * @description 针对表【sys_user_role(用户角色关联表)】的数据库操作Service实现
 * @createDate 2026-01-23 19:26:46
@@ -35,21 +38,26 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
      */
     @Override
     public void saveUserRoles(Long userId, List<Long> roleIds) {
-        if (userId == null || CollectionUtil.isEmpty(roleIds)) {
-            return ;
+        // userId 为空时无法定位用户；roleIds 为空表示清空该用户的全部角色
+        if (userId == null) {
+            return;
         }
+
+        List<Long> normalizedRoleIds = roleIds == null ? Collections.emptyList() : roleIds;
 
         // 获取现有角色
         List<Long> userRoleIds = this.list(new LambdaQueryWrapper<SysUserRole>()
                         .select(SysUserRole::getRoleId)
                         .eq(SysUserRole::getUserId, userId))
-                .parallelStream()
+                .stream()
                 .map(SysUserRole::getRoleId)
                 .toList();
 
         // 使用Set提升对比效率
         Set<Long> oldRoles = new HashSet<>(userRoleIds);
-        Set<Long> newRoles = new HashSet<>(roleIds);
+        Set<Long> newRoles = normalizedRoleIds.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
         // 计算变更集
         Set<Long> addedRoles = new HashSet<>(newRoles);
@@ -80,6 +88,12 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
         }
     }
 
+    /**
+     * 判断角色是否仍被用户关联。
+     *
+     * @param roleId 角色ID
+     * @return 是否存在关联用户
+     */
     @Override
     public boolean hasAssignedUsers(Long roleId) {
         int count = this.baseMapper.countUsersByRoleId(roleId);

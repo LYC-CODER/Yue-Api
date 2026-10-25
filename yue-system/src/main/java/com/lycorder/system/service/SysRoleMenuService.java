@@ -8,6 +8,8 @@ import java.util.Set;
 
 
 /**
+* 角色菜单关联业务接口，负责菜单ID查询及角色权限缓存维护。
+*
 * @author LYCorder
 * @description 针对表【sys_role_menu(角色菜单关联表)】的数据库操作Service
 * @createDate 2026-01-23 19:26:46

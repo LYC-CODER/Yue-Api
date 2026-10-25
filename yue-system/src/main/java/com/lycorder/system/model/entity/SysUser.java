@@ -3,6 +3,7 @@ package com.lycorder.system.model.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lycorder.common.base.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -43,9 +44,10 @@ public class SysUser extends BaseEntity {
     private Integer gender;
 
     /**
-     * 密码
+     * 密码（BCrypt 密文，禁止序列化到接口响应）
      */
-    @Schema(description = "密码")
+    @Schema(description = "密码", hidden = true)
+    @JsonIgnore
     @TableField(value = "password")
     private String password;
 

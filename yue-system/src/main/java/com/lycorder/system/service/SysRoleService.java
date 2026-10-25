@@ -14,6 +14,8 @@ import java.util.Set;
 
 
 /**
+* 角色业务接口，负责角色维护、状态管理、菜单权限分配及数据权限计算。
+*
 * @author LYCorder
 * @description 针对表【sys_role(系统角色表)】的数据库操作Service
 * @createDate 2026-01-23 19:26:46

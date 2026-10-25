@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
  * 安全模块配置属性类
  *
  * <p>映射 application.yml 中 security 前缀的安全相关配置</p>
+ * <p>必填项在应用启动时由 Jakarta Validation 校验，缺失会导致启动失败。</p>
  *
  * @author LYCoder
  */

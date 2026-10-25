@@ -29,6 +29,8 @@ import java.util.TimeZone;
 
 /**
  * Web 配置
+ * <p>
+ * 集中配置 JSON 消息转换器与 Jakarta Validation 校验器。
  *
  * @author LYCoder
  */
@@ -36,6 +38,9 @@ import java.util.TimeZone;
 @Slf4j
 public class WebMvcConfig implements WebMvcConfigurer {
 
+    /**
+     * 全局日期时间格式（yyyy-MM-dd HH:mm:ss）
+     */
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     /**
@@ -59,15 +64,18 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // 配置全局日期格式和时区
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+        // 固定东八区，避免服务器时区差异导致返回时间偏移
         objectMapper.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 
         // 处理 Long/BigInteger 的精度问题
+        // 前端 JS Number 精度不足，超长整数统一序列化为字符串
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
         simpleModule.addSerializer(BigInteger.class, ToStringSerializer.instance);
         objectMapper.registerModule(simpleModule);
 
         jackson2HttpMessageConverter.setObjectMapper(objectMapper);
+        // 插入到索引 1，保留索引 0 的 ByteArray 转换器，同时优先于默认 Jackson 转换器
         converters.add(1, jackson2HttpMessageConverter);
     }
 
@@ -82,6 +90,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         try (ValidatorFactory validatorFactory = Validation.byProvider(HibernateValidator.class)
                 .configure()
                 .failFast(true) // failFast=true 时，遇到第一个校验失败则立即返回，false 表示校验所有参数
+                // 让自定义约束校验器支持 Spring 依赖注入
                 .constraintValidatorFactory(new SpringConstraintValidatorFactory(autowireCapableBeanFactory))
                 .buildValidatorFactory()) {
 

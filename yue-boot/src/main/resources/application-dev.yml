@@ -19,19 +19,19 @@ spring:
   datasource:
     # JDBC驱动类名
     driver-class-name: com.mysql.cj.jdbc.Driver
-    # 数据库连接URL（包含字符集、SSL等参数）
-    url: jdbc:mysql://192.168.49.171:3306/real_time_api?characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true
+    # 数据库连接URL（包含字符集、SSL等参数），生产环境通过 DB_URL 覆盖
+    url: ${DB_URL:jdbc:mysql://192.168.49.171:3306/real_time_api?characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true}
     # 数据库用户名
-    username: root
+    username: ${DB_USERNAME:root}
     # 数据库密码
-    password: 123456
+    password: ${DB_PASSWORD:123456}
   # Redis配置
   data:
     redis:
       # Redis连接信息
-      host: 192.168.49.171
-      port: 6379
-#      password: 123456
+      host: ${REDIS_HOST:192.168.49.171}
+      port: ${REDIS_PORT:6379}
+#      password: ${REDIS_PASSWORD:}
 
   # 应用启动Banner配置
   banner:
@@ -53,7 +53,7 @@ spring:
 # OpenAPI 文档配置
 springdoc:
   swagger-ui:
-    # Swagger UI访问路径和排序规则
+    # Knife4j 使用 /doc.html，springdoc 自身保留默认 /swagger-ui.html
     path: /swagger-ui.html
     tags-sorter: alpha
     operations-sorter: alpha
@@ -70,14 +70,11 @@ springdoc:
         - com.lycorder.platform.file.controller
         - com.lycorder.platform.realtime.controller
 
-# Knife4j 增强配置
+# Knife4j 使用其静态 UI 即可；必须保持 false，避免增强配置与 springdoc 2.8 不兼容
 knife4j:
-  # 启用Knife4j增强功能
   enable: false
-  # 生产环境开关（false表示启用文档）
   production: false
   setting:
-    # 设置文档界面语言为中文
     language: zh_cn
 
 # 验证码配置
@@ -97,7 +94,7 @@ captcha:
     # 验证码字符类型 math-算术|random-随机字符
     type: math
     # 验证码字符长度，type=算术时，表示运算位数(1:个位数运算 2:十位数运算)；type=随机字符时，表示字符个数
-    length: 1
+    length: 2
   # 验证码字体
   font:
     # 字体名称 Dialog|DialogInput|Monospaced|Serif|SansSerif
@@ -116,7 +113,8 @@ security:
     access-token-time-to-live: 7200   # 访问令牌 有效期(单位：秒)，默认 2 小时，-1 表示永不过期
     refresh-token-time-to-live: 604800   # 刷新令牌有效期(单位：秒)，默认 7 天，-1 表示永不过期
     jwt:
-      secret-key: SecretKey012345678901234567890123456789012345678901234567890123456789 # JWT密钥(HS256算法至少32字符)
+      # JWT 密钥，生产环境必须通过 JWT_SECRET 覆盖
+      secret-key: ${JWT_SECRET:SecretKey012345678901234567890123456789012345678901234567890123456789}
     redis-token:
       allow-multi-login: true # 是否允许多设备登录
   # 安全白名单路径，仅跳过 AuthorizationFilter 过滤器，还是会走 Spring Security 的其他过滤器(CSRF、CORS等)
@@ -135,20 +133,24 @@ security:
     - /webjars/**
     - /favicon.ico
 
+# 跨域白名单，多个来源用英文逗号分隔
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000}
+
 # 文件存储配置
 oss:
   # OSS 类型 (目前支持minio)
-  type: minio
+  type: ${OSS_TYPE:minio}
   # MinIO 对象存储服务
   minio:
     # 服务Endpoint
-    endpoint: http://192.168.49.171:9010
+    endpoint: ${MINIO_ENDPOINT:http://192.168.49.171:9010}
     # 访问凭据
-    access-key: LYCoder
+    access-key: ${MINIO_ACCESS_KEY:LYCoder}
     # 凭据密钥
-    secret-key: 293814.Lyc
+    secret-key: ${MINIO_SECRET_KEY:293814.Lyc}
     # 存储桶名称
-    bucket-name: real-time-api
+    bucket-name: ${MINIO_BUCKET_NAME:real-time-api}
     # (可选)自定义域名，如果配置了域名，生成的文件URL是域名格式，未配置则URL则是IP格式 (eg: https://www.youlai.tech/storage)
     custom-domain:
   local:

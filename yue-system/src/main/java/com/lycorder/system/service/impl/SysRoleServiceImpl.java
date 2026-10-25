@@ -24,6 +24,8 @@ import com.lycorder.system.service.SysUserRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +33,8 @@ import java.util.Set;
 
 
 /**
+* 角色业务实现，负责角色维护、权限分配及权限缓存刷新。
+*
 * @author LYCorder
 * @description 针对表【sys_role(系统角色表)】的数据库操作Service实现
 * @createDate 2026-01-23 19:26:46
@@ -105,6 +109,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         return sysRoleConverter.toOptions(roleList);
     }
 
+    /**
+     * 新增或修改角色，并在角色编码、状态变更时刷新权限缓存。
+     *
+     * @param roleForm 角色表单数据
+     * @return 是否保存成功
+     */
     @Override
     public boolean saveRole(RoleForm roleForm) {
 
@@ -217,6 +227,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
         return sysRoleMenuService.listMenuIdsByRoleId(roleId);
     }
 
+    /**
+     * 为角色分配菜单权限，采用先删后增的全量覆盖方式。
+     *
+     * @param roleId  角色ID
+     * @param menuIds 菜单ID集合
+     */
     @Override
     @Transactional
     public void assignMenusToRole(Long roleId, List<Long> menuIds) {
@@ -238,8 +254,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
             sysRoleMenuService.saveBatch(roleMenus);
         }
 
-        // 刷新角色的权限缓存
-        sysRoleMenuService.refreshRolePermsCache(role.getCode());
+        // 事务提交后再刷新缓存，避免回滚时缓存已被错误更新
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                sysRoleMenuService.refreshRolePermsCache(role.getCode());
+            }
+        });
     }
 }
 

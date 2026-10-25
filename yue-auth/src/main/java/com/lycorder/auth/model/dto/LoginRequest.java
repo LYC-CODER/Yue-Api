@@ -6,7 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
- * 登录请求参数
+ * 登录请求参数。
+ * <p>
+ * 承载用户名、密码以及图形验证码校验所需的验证码标识和验证码文本。
  *
  * @author LYCoder
  */

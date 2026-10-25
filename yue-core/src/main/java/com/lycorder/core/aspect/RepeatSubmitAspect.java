@@ -28,6 +28,9 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 防重复提交切面
+ * <p>
+ * 通过 Redisson 分布式锁拦截同一用户在锁过期时间内的重复请求：
+ * 用户标识优先取 Token 的 SHA-256 摘要，未携带 Token 时退化为客户端 IP。
  *
  * @author Ray.Hao
  * @since 2.3.0
@@ -42,6 +45,8 @@ public class RepeatSubmitAspect {
 
     /**
      * 防重复提交切点
+     *
+     * @param repeatSubmit 防重复提交注解，用于绑定切点参数
      */
     @Pointcut("@annotation(repeatSubmit)")
     public void repeatSubmitPointCut(RepeatSubmit repeatSubmit) {
@@ -49,6 +54,11 @@ public class RepeatSubmitAspect {
 
     /**
      * 环绕通知：处理防重复提交逻辑
+     *
+     * @param pjp          目标方法连接点
+     * @param repeatSubmit 防重复提交注解，提供锁的过期时间
+     * @return 目标方法执行结果
+     * @throws Throwable 目标方法抛出的异常；重复提交时抛出 {@link BusinessException}
      */
     @Around(value = "repeatSubmitPointCut(repeatSubmit)", argNames = "pjp,repeatSubmit")
     public Object handleRepeatSubmit(ProceedingJoinPoint pjp, RepeatSubmit repeatSubmit) throws Throwable {
@@ -57,10 +67,12 @@ public class RepeatSubmitAspect {
         int expire = repeatSubmit.expire();
         RLock lock = redissonClient.getLock(lockKey);
 
+        // waitTime 为 0 表示不等待，获取失败立即判定为重复提交；leaseTime 到期后锁自动释放
         boolean locked = lock.tryLock(0, expire, TimeUnit.SECONDS);
         if (!locked) {
             throw new BusinessException(ResultCode.DUPLICATE_SUBMISSION);
         }
+        // 不在此处手动解锁，依赖锁的过期时间覆盖重复提交窗口
         return pjp.proceed();
     }
 
@@ -72,8 +84,14 @@ public class RepeatSubmitAspect {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         // 用户唯一标识
         String userIdentifier = getUserIdentifier(request);
-        // 请求唯一标识 = 请求方法 + 请求路径 + 请求参数(严谨的做法)
-        String requestIdentifier = StrUtil.join(":", request.getMethod(), request.getRequestURI());
+        // 请求唯一标识 = 请求方法 + 请求路径 + 查询参数，减少不同 payload 之间的误判
+        String requestIdentifier = StrUtil.join(
+                ":",
+                request.getMethod(),
+                request.getRequestURI(),
+                StrUtil.blankToDefault(request.getQueryString(), "")
+        );
+        // 锁粒度：用户标识 + 请求标识，避免不同用户/接口之间互相影响
         return StrUtil.format(RedisConstants.Lock.RESUBMIT, userIdentifier, requestIdentifier);
     }
 

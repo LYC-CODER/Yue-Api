@@ -39,10 +39,18 @@ cd real-time-api
 # 创建数据库
 mysql -u root -p -e "CREATE DATABASE real_time_api DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-# 执行初始化脚本
-mysql -u root -p real_time_api < doc/sql/init.sql
-mysql -u root -p real_time_api < doc/sql/data.sql
+# 执行项目初始化脚本（如项目未提供 init.sql，可跳过）
+mysql -u root -p real_time_api < docs/sql/init.sql
+
+# 通知公告：建表、菜单、按钮权限、字典
+mysql -u root -p real_time_api < docs/sql/notice-menu.sql
+
+# 系统配置：建表、菜单、按钮权限
+mysql -u root -p real_time_api < docs/sql/config-menu.sql
 ```
+
+> 如果数据库已经存在 `sys_notice`、`sys_user_notice`、`sys_config` 表，脚本中的 `CREATE TABLE IF NOT EXISTS` 不会覆盖已有数据。  
+> 执行菜单脚本后需要重启后端，或重新保存一次角色菜单，使权限缓存生效。
 
 #### 1.3 配置文件
 编辑 `application-dev.yml`：

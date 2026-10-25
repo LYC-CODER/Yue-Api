@@ -33,6 +33,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+* 菜单业务实现，负责菜单树构建、路由生成及菜单维护。
+*
 * @author LYCorder
 * @description 针对表【sys_menu(系统菜单表)】的数据库操作Service实现
 * @createDate 2026-01-23 19:26:46
@@ -44,9 +46,16 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
 
     private final SysMenuConverter sysMenuConverter;
     private final SysRoleMenuService sysRoleMenuService;
+    private final ObjectMapper objectMapper;
 
 
 
+    /**
+     * 查询菜单树列表。
+     *
+     * @param queryParams 菜单查询参数
+     * @return 菜单树列表
+     */
     @Override
     public List<MenuVO> listMenus(MenuQuery queryParams) {
         List<SysMenu> menus = this.list(new LambdaQueryWrapper<SysMenu>()
@@ -92,6 +101,12 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
                 }).toList();
     }
 
+    /**
+     * 获取菜单下拉选项。
+     *
+     * @param onlyParent 是否只查询父级菜单
+     * @return 菜单下拉选项
+     */
     @Override
     public List<Option<Long>> listMenuOptions(boolean onlyParent) {
         List<SysMenu> menuList = this.list(new LambdaQueryWrapper<SysMenu>()
@@ -233,7 +248,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         String paramsJson = menu.getParams();
         // 将 JSON 字符串转换为 Map<String, String>
         if (StrUtil.isNotBlank(paramsJson)) {
-            ObjectMapper objectMapper = new ObjectMapper();
             try {
                 Map<String, String> paramMap = objectMapper.readValue(paramsJson, new TypeReference<>() {
                 });
@@ -246,6 +260,12 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         return routeVo;
     }
 
+    /**
+     * 获取菜单编辑表单数据，并将路由参数JSON转换为键值对列表。
+     *
+     * @param id 菜单ID
+     * @return 菜单表单数据
+     */
     @Override
     public MenuForm getMenuForm(Long id) {
 
@@ -255,7 +275,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
         // 路由参数字符串 {"id":"1","name":"张三"} 转换为 [{key:"id", value:"1"}, {key:"name", value:"张三"}]
         String params = entity.getParams();
         if (StrUtil.isNotBlank(params)) {
-            ObjectMapper objectMapper = new ObjectMapper();
             try {
                 // 解析 JSON 字符串为 Map<String, String>
                 Map<String, String> paramMap = objectMapper.readValue(params, new TypeReference<>() {
@@ -283,7 +302,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
      *                 菜单类型为目录时，routePath 必须以 / 开头
      *                 菜单类型为菜单时，component 必须填写
      *                 菜单类型为按钮时，perm 必须填写
-     *
+     * @return 是否保存成功
      */
     @Override
     public boolean saveMenu(MenuForm menuForm) {
@@ -386,6 +405,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
     @Override
     public boolean deleteMenu(Long id) {
 
+        // 同时删除当前菜单及所有子孙菜单（通过 tree_path 匹配）
         boolean result = this.remove(new LambdaQueryWrapper<SysMenu>()
                 .eq(SysMenu::getId, id)
                 .or()

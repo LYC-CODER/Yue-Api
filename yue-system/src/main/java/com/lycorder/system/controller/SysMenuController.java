@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
+ * 菜单管理接口，负责菜单树查询、表单维护、显示状态调整及当前用户路由生成。
+ *
  * @projectName: Real-Time-Api
  * @package: com.lycorder.system.controller
  * @className: SysMenuController
@@ -34,13 +36,26 @@ public class SysMenuController {
 
     private final SysMenuService sysMenuService;
 
+    /**
+     * 查询菜单树列表。
+     *
+     * @param queryParams 菜单查询参数
+     * @return 菜单树列表
+     */
     @Operation(summary = "菜单列表")
     @GetMapping
+    @PreAuthorize("@ss.hasPerm('sys:menu:list')")
     public Result<List<MenuVO>> getMenus(MenuQuery queryParams) {
         List<MenuVO> menuList = sysMenuService.listMenus(queryParams);
         return Result.success(menuList);
     }
 
+    /**
+     * 获取菜单下拉选项。
+     *
+     * @param onlyParent 是否只查询父级菜单
+     * @return 菜单下拉选项
+     */
     @Operation(summary = "菜单下拉列表")
     @GetMapping("/options")
     public Result<List<Option<Long>>> getMenuOptions(
@@ -51,6 +66,11 @@ public class SysMenuController {
         return Result.success(menus);
     }
 
+    /**
+     * 获取当前登录用户可访问的菜单路由。
+     *
+     * @return 菜单路由列表
+     */
     @Operation(summary = "当前用户菜单路由列表")
     @GetMapping("/routes")
     public Result<List<RouteVO>> getCurrentUserRoutes() {
@@ -58,6 +78,12 @@ public class SysMenuController {
         return Result.success(routeList);
     }
 
+    /**
+     * 获取菜单编辑表单数据。
+     *
+     * @param id 菜单ID
+     * @return 菜单表单数据
+     */
     @Operation(summary = "菜单表单数据")
     @GetMapping("/{id}/form")
     @PreAuthorize("@ss.hasPerm('sys:menu:update')")
@@ -68,6 +94,12 @@ public class SysMenuController {
         return Result.success(menu);
     }
 
+    /**
+     * 新增菜单。
+     *
+     * @param menuForm 菜单表单数据
+     * @return 操作结果
+     */
     @Operation(summary = "新增菜单")
     @PostMapping
     @PreAuthorize("@ss.hasPerm('sys:menu:create')")
@@ -77,6 +109,12 @@ public class SysMenuController {
         return Result.judge(result);
     }
 
+    /**
+     * 修改菜单信息。
+     *
+     * @param menuForm 菜单表单数据
+     * @return 操作结果
+     */
     @Operation(summary = "修改菜单")
     @PutMapping(value = "/{id}")
     @PreAuthorize("@ss.hasPerm('sys:menu:update')")
@@ -87,6 +125,12 @@ public class SysMenuController {
         return Result.judge(result);
     }
 
+    /**
+     * 删除指定菜单及其子菜单。
+     *
+     * @param id 菜单ID
+     * @return 操作结果
+     */
     @Operation(summary = "删除菜单")
     @DeleteMapping("/{id}")
     @PreAuthorize("@ss.hasPerm('sys:menu:delete')")
@@ -97,6 +141,13 @@ public class SysMenuController {
         return Result.judge(result);
     }
 
+    /**
+     * 修改菜单显示状态。
+     *
+     * @param menuId  菜单ID
+     * @param visible 显示状态（1：显示；0：隐藏）
+     * @return 操作结果
+     */
     @Operation(summary = "修改菜单显示状态")
     @PatchMapping("/{menuId}")
     @PreAuthorize("@ss.hasPerm('sys:menu:update')")

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * 键值对
+ * <p>
+ * 用于字典项、选项列表等简单的键值数据传输场景。
  *
  * @author LYCoder
  */
@@ -15,6 +17,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class KeyValue {
 
+    /**
+     * 构造键值对。
+     *
+     * @param key   键（选项值）
+     * @param value 值（选项标签）
+     */
     public KeyValue(String key, String value) {
         this.key = key;
         this.value = value;

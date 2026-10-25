@@ -19,7 +19,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * Token 认证校验过滤器
+ * Token 认证校验过滤器。
+ * <p>
+ * 从请求头中提取 Bearer 令牌，完成验签、过期校验和黑名单校验后，
+ * 将令牌解析为认证对象写入 Spring Security 上下文。
+ *
  * @author LYCoder
  */
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
@@ -29,6 +33,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
      */
     private final TokenManager tokenManager;
 
+    /**
+     * 创建 Token 认证过滤器。
+     *
+     * @param tokenManager Token 管理器
+     */
     public TokenAuthenticationFilter(TokenManager tokenManager) {
         this.tokenManager = tokenManager;
     }
@@ -36,6 +45,12 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     /**
      * 校验 Token ，包括验签和是否过期
      * 如果 Token 有效，将 Token 解析为 Authentication 对象，并设置到 Spring Security 上下文中
+     *
+     * @param request     当前 HTTP 请求
+     * @param response    当前 HTTP 响应
+     * @param filterChain 过滤器链
+     * @throws ServletException Servlet 处理异常
+     * @throws IOException      读写请求或响应失败时抛出
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -43,6 +58,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         try {
+            // 未携带 Bearer 令牌时保持匿名身份，由后续授权规则决定是否拒绝
             if (StrUtil.isNotBlank(authorizationHeader)
                     && authorizationHeader.startsWith(SecurityConstants.BEARER_TOKEN_PREFIX)) {
 

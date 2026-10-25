@@ -120,6 +120,7 @@ public class UserImportListener extends AnalysisEventListener<UserImportDTO> {
             }
         }
 
+        // 全部字段校验通过后再落库，避免无效数据进入数据库
         if (validation) {
             try {
                 SysUser entity = sysUserConverter.toEntity(userImportDto);
@@ -145,6 +146,7 @@ public class UserImportListener extends AnalysisEventListener<UserImportDTO> {
                     errorMsg += "第" + currentRow + "行数据保存失败；";
                     excelResult.getMessageList().add(errorMsg);
                 }
+            // 并发导入或 Excel 内重复用户名可能触发唯一键冲突，按行记录错误
             } catch (DuplicateKeyException e) {
                 excelResult.setInvalidCount(excelResult.getInvalidCount() + 1);
                 String duplicateErrorMsg = "第" + currentRow + "行数据保存失败：用户名 " + username + " 已存在（可能是 Excel 中存在重复用户名）";

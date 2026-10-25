@@ -4,17 +4,102 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="eaba1413-123e-4fd6-a20b-bd18fe5f961b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yue-auth/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yue-boot/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yue-common/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yue-core/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yue-platform/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yue-plugin/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yue-security/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yue-system/pom.xml" afterDir="false" />
+    <list default="true" id="eaba1413-123e-4fd6-a20b-bd18fe5f961b" name="Changes" comment="modify">
+      <change beforePath="$PROJECT_DIR$/docs/api-documentation.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/api-documentation.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/deployment-guide.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/deployment-guide.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/system-module.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/system-module.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-auth/src/main/java/com/lycorder/auth/config/CaptchaConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-auth/src/main/java/com/lycorder/auth/config/CaptchaConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-auth/src/main/java/com/lycorder/auth/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-auth/src/main/java/com/lycorder/auth/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-auth/src/main/java/com/lycorder/auth/model/dto/LoginRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-auth/src/main/java/com/lycorder/auth/model/dto/LoginRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-auth/src/main/java/com/lycorder/auth/model/vo/CaptchaVO.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-auth/src/main/java/com/lycorder/auth/model/vo/CaptchaVO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-auth/src/main/java/com/lycorder/auth/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-auth/src/main/java/com/lycorder/auth/service/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-auth/src/main/java/com/lycorder/auth/service/impl/AuthServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-auth/src/main/java/com/lycorder/auth/service/impl/AuthServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-boot/src/main/java/com/lycorder/ApiSystemApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-boot/src/main/java/com/lycorder/ApiSystemApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-boot/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/yue-boot/src/main/resources/application-dev.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-boot/src/main/resources/application-prod.yml" beforeDir="false" afterPath="$PROJECT_DIR$/yue-boot/src/main/resources/application-prod.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-boot/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/yue-boot/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/config/property/CaptchaProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/config/property/CaptchaProperties.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/config/property/SecurityProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/config/property/SecurityProperties.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/constant/RedisConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/constant/RedisConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/model/KeyValue.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/model/KeyValue.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/model/Option.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/model/Option.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/util/DateUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/util/DateUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/util/ExcelUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/util/ExcelUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/util/IPUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/util/IPUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/validator/FieldValidator.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-common/src/main/java/com/lycorder/common/validator/FieldValidator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/aspect/RepeatSubmitAspect.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/aspect/RepeatSubmitAspect.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/config/CaffeineConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/config/CaffeineConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/config/CorsConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/config/CorsConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/config/JacksonConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/config/JacksonConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/config/RedisCacheConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/config/RedisCacheConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/config/RedisConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/config/RedisConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/config/WebMvcConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/config/WebMvcConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/event/LogEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/event/LogEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/exception/BusinessException.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/exception/BusinessException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/result/ExcelResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/result/ExcelResult.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/result/IResultCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/result/IResultCode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/result/PageResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/result/PageResult.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/result/Result.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/result/Result.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/result/ResultCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/result/ResultCode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/result/WebResponseWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-core/src/main/java/com/lycorder/core/result/WebResponseWriter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-platform/src/main/java/com/lycorder/platform/file/controller/FileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-platform/src/main/java/com/lycorder/platform/file/controller/FileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-platform/src/main/java/com/lycorder/platform/file/model/FileInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-platform/src/main/java/com/lycorder/platform/file/model/FileInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-platform/src/main/java/com/lycorder/platform/file/service/FileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-platform/src/main/java/com/lycorder/platform/file/service/FileService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-platform/src/main/java/com/lycorder/platform/file/service/impl/LocalFileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-platform/src/main/java/com/lycorder/platform/file/service/impl/LocalFileService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-platform/src/main/java/com/lycorder/platform/file/service/impl/MinioFileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-platform/src/main/java/com/lycorder/platform/file/service/impl/MinioFileService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-plugin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/yue-plugin/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-plugin/src/main/java/com/lycorder/plugin/config/MybatisConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-plugin/src/main/java/com/lycorder/plugin/config/MybatisConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-plugin/src/main/java/com/lycorder/plugin/knife4j/OpenApiConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-plugin/src/main/java/com/lycorder/plugin/knife4j/OpenApiConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-plugin/src/main/java/com/lycorder/plugin/mybatis/ApiDataPermissionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-plugin/src/main/java/com/lycorder/plugin/mybatis/ApiDataPermissionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-plugin/src/main/java/com/lycorder/plugin/mybatis/ApiMetaObjectHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-plugin/src/main/java/com/lycorder/plugin/mybatis/ApiMetaObjectHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/aspect/LogAspect.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/aspect/LogAspect.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/config/PasswordEncoderConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/config/PasswordEncoderConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/filter/CaptchaValidationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/filter/CaptchaValidationFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/filter/TokenAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/filter/TokenAuthenticationFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/handler/ApiAccessDeniedHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/handler/ApiAccessDeniedHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/handler/ApiAuthenticationEntryPoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/handler/ApiAuthenticationEntryPoint.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/model/AuthenticationToken.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/model/AuthenticationToken.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/model/OnlineUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/model/OnlineUser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/model/SysUserDetails.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/model/SysUserDetails.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/model/UserAuthInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/model/UserAuthInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/service/PermissionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/service/PermissionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/token/JwtTokenManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/token/JwtTokenManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/token/RedisTokenManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/token/RedisTokenManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/token/TokenManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/token/TokenManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/util/SecurityUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-security/src/main/java/com/lycorder/security/util/SecurityUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/controller/SysDeptController.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/controller/SysDeptController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/controller/SysDictController.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/controller/SysDictController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/controller/SysLogController.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/controller/SysLogController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/controller/SysMenuController.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/controller/SysMenuController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/controller/SysRoleController.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/controller/SysRoleController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/controller/SysUserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/controller/SysUserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/listener/LogEventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/listener/LogEventListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/listener/UserImportListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/listener/UserImportListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/mapper/SysUserMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/mapper/SysUserMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/model/entity/SysUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/model/entity/SysUser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/model/form/PasswordUpdateForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/model/form/PasswordUpdateForm.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/model/query/NoticeQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/model/query/NoticeQuery.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysDeptService.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysDeptService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysDictItemService.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysDictItemService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysDictService.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysDictService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysLogService.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysLogService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysMenuService.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysMenuService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysRoleMenuService.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysRoleMenuService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysRoleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysRoleService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysUserRoleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysUserRoleService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/SysUserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysDeptServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysDeptServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysDictItemServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysDictItemServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysDictServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysDictServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysLogServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysLogServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysMenuServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysMenuServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysRoleMenuServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysRoleMenuServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysRoleServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysRoleServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysUserRoleServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysUserRoleServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysUserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/yue-system/src/main/java/com/lycorder/system/service/impl/SysUserServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +109,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;LYC-CODER&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/LYC-CODER/Yue-Api.git&quot;,
+    &quot;accountId&quot;: &quot;54044362-e6a3-45f6-a902-912273fb500f&quot;
+  }
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -33,6 +130,9 @@
         <option name="userSettingsFile" value="F:\software\apache-maven-3.6.3-bin\apache-maven-3.6.3\conf\settings.xml" />
       </MavenGeneralSettings>
     </option>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="2" />
@@ -53,6 +153,7 @@
     &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
     &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;Spring Boot.ApiSystemApplication.executor&quot;: &quot;Run&quot;,
@@ -60,6 +161,7 @@
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;onboarding.tips.debug.path&quot;: &quot;F:/Code/web/Yue-Api/yue-platform/src/main/java/com/lycorder/Main.java&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -88,12 +190,18 @@
       <option name="presentableId" value="Default" />
       <updated>1792659079353</updated>
       <workItem from="1792659083689" duration="4933000" />
-      <workItem from="1792668455014" duration="1110000" />
+      <workItem from="1792668455014" duration="3333000" />
+      <workItem from="1792855706897" duration="9963000" />
+      <workItem from="1792910725721" duration="5417000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="modify" />
+    <option name="LAST_COMMIT_MESSAGE" value="modify" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

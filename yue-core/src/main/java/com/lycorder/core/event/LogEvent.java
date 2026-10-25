@@ -8,6 +8,7 @@ import lombok.Data;
  * <p>
  * 由日志切面（yue-security）发布，由业务模块（yue-system）监听并持久化，
  * 用于解除框架层对业务层的依赖。
+ * 事件仅承载请求上下文与执行结果数据，不包含任何持久化行为。
  * </p>
  *
  * @author LYCoder

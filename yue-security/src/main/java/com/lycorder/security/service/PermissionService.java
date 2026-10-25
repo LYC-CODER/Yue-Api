@@ -13,7 +13,10 @@ import org.springframework.util.PatternMatchUtils;
 import java.util.*;
 
 /**
- * SpringSecurity 权限校验
+ * Spring Security 权限校验组件。
+ * <p>
+ * 以 Bean 名称 {@code ss} 注册，可在 {@code @PreAuthorize("@ss.hasPerm('xxx')")} 中调用；
+ * 超级管理员直接放行，其余用户依据角色对应的权限缓存进行通配符匹配。
  *
  * @author LYCoder
  */
@@ -32,6 +35,7 @@ public class PermissionService {
      */
     public boolean hasPerm(String requiredPerm) {
 
+        // 权限标识为空时视为无权限，避免空值导致误放行
         if (StrUtil.isBlank(requiredPerm)) {
             return false;
         }
@@ -42,12 +46,14 @@ public class PermissionService {
 
         // 获取当前登录用户的角色编码集合
         Set<String> roleCodes = SecurityUtils.getRoles();
+        // 未分配任何角色时直接拒绝
         if (CollectionUtil.isEmpty(roleCodes)) {
             return false;
         }
 
         // 获取当前登录用户的所有角色的权限列表
         Set<String> rolePerms = this.getRolePermsFormCache(roleCodes);
+        // 角色未配置权限时直接拒绝
         if (CollectionUtil.isEmpty(rolePerms)) {
             return false;
         }
@@ -62,6 +68,24 @@ public class PermissionService {
             log.error("用户无操作权限：{}",requiredPerm);
         }
         return hasPermission;
+    }
+
+
+    /**
+     * 判断当前登录用户是否拥有指定角色。
+     *
+     * @param roleCode 角色编码
+     * @return 是否拥有该角色
+     */
+    public boolean hasRole(String roleCode) {
+        if (StrUtil.isBlank(roleCode)) {
+            return false;
+        }
+        if (SecurityUtils.isRoot()) {
+            return true;
+        }
+        Set<String> roleCodes = SecurityUtils.getRoles();
+        return CollectionUtil.isNotEmpty(roleCodes) && roleCodes.contains(roleCode);
     }
 
 
@@ -81,8 +105,10 @@ public class PermissionService {
 
         Set<String> perms = new HashSet<>();
         Collection<Object> roleCodesAsObjects = new ArrayList<>(roleCodes);
+        // 按角色编码批量读取 Hash，减少与 Redis 的交互次数
         List<Object> rolePermsList = redisTemplate.opsForHash().multiGet(cacheKey, roleCodesAsObjects);
 
+        // 跳过缓存缺失或类型不符的条目，仅合并 Set 类型的权限集合
         for (Object rolePermsObj : rolePermsList) {
             if (rolePermsObj instanceof Set) {
                 @SuppressWarnings("unchecked")

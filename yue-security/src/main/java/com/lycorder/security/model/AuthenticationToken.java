@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * 认证令牌响应对象
+ * 认证令牌响应对象。
+ * <p>
+ * 登录或刷新令牌成功后返回，包含访问令牌、刷新令牌以及访问令牌的有效期。
  *
  * @author LYCoder
  */

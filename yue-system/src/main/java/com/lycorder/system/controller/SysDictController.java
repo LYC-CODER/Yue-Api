@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * 字典管理接口，负责字典及其字典项的分页查询、增删改和下拉数据维护。
+ *
  * @projectName: Real-Time-Api
  * @package: com.lycorder.system.controller
  * @className: SysDictController
@@ -50,6 +52,12 @@ public class SysDictController {
     //---------------------------------------------------//
     // 字典相关接口
     //---------------------------------------------------//
+    /**
+     * 分页查询字典列表。
+     *
+     * @param queryParams 字典查询参数
+     * @return 字典分页数据
+     */
     @Operation(summary = "字典分页列表")
     @GetMapping
     @Log(value = "字典分页列表",module = LogModuleEnum.DICT)
@@ -60,6 +68,11 @@ public class SysDictController {
         return PageResult.success(result);
     }
 
+    /**
+     * 获取字典下拉列表。
+     *
+     * @return 字典选项列表
+     */
     @Operation(summary = "字典列表")
     @GetMapping("/options")
     @Log(value = "字典列表",module = LogModuleEnum.DICT)
@@ -68,6 +81,12 @@ public class SysDictController {
         return Result.success(list);
     }
 
+    /**
+     * 获取字典编辑表单数据。
+     *
+     * @param id 字典ID
+     * @return 字典表单数据
+     */
     @Operation(summary = "获取字典表单数据")
     @GetMapping("/{id}/form")
     @Log(value = "获取字典表单数据",module = LogModuleEnum.DICT)
@@ -78,6 +97,12 @@ public class SysDictController {
         return Result.success(formData);
     }
 
+    /**
+     * 新增字典。
+     *
+     * @param formData 字典表单数据
+     * @return 操作结果
+     */
     @Operation(summary = "新增字典")
     @PostMapping
     @PreAuthorize("@ss.hasPerm('sys:dict:create')")
@@ -88,6 +113,13 @@ public class SysDictController {
         return Result.judge(result);
     }
 
+    /**
+     * 修改字典信息。
+     *
+     * @param id       字典ID
+     * @param dictForm 字典表单数据
+     * @return 操作结果
+     */
     @Operation(summary = "修改字典")
     @PutMapping("/{id}")
     @PreAuthorize("@ss.hasPerm('sys:dict:update')")
@@ -100,6 +132,12 @@ public class SysDictController {
         return Result.judge(status);
     }
 
+    /**
+     * 批量删除字典。
+     *
+     * @param ids 字典ID字符串，多个以英文逗号分隔
+     * @return 操作结果
+     */
     @Operation(summary = "删除字典")
     @DeleteMapping("/{ids}")
     @PreAuthorize("@ss.hasPerm('sys:dict:delete')")
@@ -124,6 +162,13 @@ public class SysDictController {
     //---------------------------------------------------
     // 字典项相关接口
     //---------------------------------------------------
+    /**
+     * 分页查询指定字典下的字典项。
+     *
+     * @param dictCode    字典编码
+     * @param queryParams 字典项查询参数
+     * @return 字典项分页数据
+     */
     @Operation(summary = "字典项分页列表")
     @GetMapping("/{dictCode}/items")
     @Log(value = "字典项分页列表",module = LogModuleEnum.DICT)
@@ -137,6 +182,12 @@ public class SysDictController {
     }
 
 
+    /**
+     * 获取指定字典的字典项选项。
+     *
+     * @param dictCode 字典编码
+     * @return 字典项选项列表
+     */
     @Operation(summary = "字典项列表")
     @GetMapping("/{dictCode}/items/options")
     @Log(value = "字典项列表",module = LogModuleEnum.DICT)
@@ -148,6 +199,13 @@ public class SysDictController {
     }
 
 
+    /**
+     * 新增字典项。
+     *
+     * @param dictCode 字典编码
+     * @param formData 字典项表单数据
+     * @return 操作结果
+     */
     @Operation(summary = "新增字典项")
     @PostMapping("/{dictCode}/items")
     @PreAuthorize("@ss.hasPerm('sys:dict-item:create')")
@@ -164,6 +222,13 @@ public class SysDictController {
     }
 
 
+    /**
+     * 获取字典项编辑表单数据。
+     *
+     * @param dictCode 字典编码
+     * @param itemId   字典项ID
+     * @return 字典项表单数据
+     */
     @Operation(summary = "字典项表单数据")
     @GetMapping("/{dictCode}/items/{itemId}/form")
     @Log(value = "字典项表单数据",module = LogModuleEnum.DICT)
@@ -176,6 +241,14 @@ public class SysDictController {
     }
 
 
+    /**
+     * 修改字典项。
+     *
+     * @param dictCode 字典编码
+     * @param itemId   字典项ID
+     * @param formData 字典项表单数据
+     * @return 操作结果
+     */
     @Operation(summary = "修改字典项")
     @PutMapping("/{dictCode}/items/{itemId}")
     @PreAuthorize("@ss.hasPerm('sys:dict-item:update')")
@@ -194,6 +267,13 @@ public class SysDictController {
     }
 
 
+    /**
+     * 批量删除字典项。
+     *
+     * @param dictCode 字典编码
+     * @param itemIds  字典项ID字符串，多个以英文逗号分隔
+     * @return 操作结果
+     */
     @Operation(summary = "删除字典项")
     @DeleteMapping("/{dictCode}/items/{itemIds}")
     @PreAuthorize("@ss.hasPerm('sys:dict-item:delete')")

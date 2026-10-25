@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
  * 全局系统异常处理器
  * <p>
  * 调整异常处理的HTTP状态码，丰富异常处理类型
+ * 统一将控制器层抛出的异常转换为 {@link Result}，并按异常类型调整 HTTP 状态码。
  * @author LYCoder
  */
 @RestControllerAdvice
@@ -46,6 +47,10 @@ public class GlobalExceptionHandler {
      * 处理绑定异常
      * <p>
      * 当请求参数绑定到对象时发生错误，会抛出 BindException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   参数绑定异常，包含各字段的校验错误
+     * @return 统一错误响应，提示信息为各字段错误信息的拼接
      */
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -60,6 +65,10 @@ public class GlobalExceptionHandler {
      * <p>
      * 当请求参数在校验过程中发生违反约束条件的异常时（如 @RequestParam 验证不通过），
      * 会捕获到 ConstraintViolationException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   约束校验异常，包含全部违规项
+     * @return 统一错误响应，提示信息为各违规项消息的拼接
      */
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -74,6 +83,10 @@ public class GlobalExceptionHandler {
      * <p>
      * 当使用 @Valid 或 @Validated 注解对方法参数进行验证时，如果验证失败，
      * 会抛出 MethodArgumentNotValidException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   方法参数校验异常，包含数据绑定结果
+     * @return 统一错误响应，提示信息为各字段错误信息的拼接
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -87,6 +100,10 @@ public class GlobalExceptionHandler {
      * 处理接口不存在的异常
      * <p>
      * 当客户端请求一个不存在的路径时，会抛出 NoHandlerFoundException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   找不到处理器异常
+     * @return 统一错误响应，业务码为“接口不存在”
      */
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -99,6 +116,10 @@ public class GlobalExceptionHandler {
      * 处理缺少请求参数的异常
      * <p>
      * 当请求缺少必需的参数时，会抛出 MissingServletRequestParameterException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   缺少请求参数异常
+     * @return 统一错误响应，业务码为“请求必填参数为空”
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -111,6 +132,10 @@ public class GlobalExceptionHandler {
      * 处理方法参数类型不匹配的异常
      * <p>
      * 当请求参数类型不匹配时，会抛出 MethodArgumentTypeMismatchException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   参数类型不匹配异常
+     * @return 统一错误响应，提示“类型错误”
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -123,6 +148,10 @@ public class GlobalExceptionHandler {
      * 处理 Servlet 异常
      * <p>
      * 当 Servlet 处理请求时发生异常时，会抛出 ServletException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   Servlet 异常
+     * @return 统一错误响应，提示信息取异常消息
      */
     @ExceptionHandler(ServletException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -135,6 +164,10 @@ public class GlobalExceptionHandler {
      * 处理非法参数异常
      * <p>
      * 当方法接收到非法参数时，会抛出 IllegalArgumentException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   非法参数异常
+     * @return 统一错误响应，提示信息取异常消息
      */
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -147,6 +180,10 @@ public class GlobalExceptionHandler {
      * 处理 JSON 处理异常
      * <p>
      * 当处理 JSON 数据时发生错误，会抛出 JsonProcessingException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   JSON 处理异常
+     * @return 统一错误响应，提示信息取异常消息
      */
     @ExceptionHandler(JsonProcessingException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -159,6 +196,10 @@ public class GlobalExceptionHandler {
      * 处理请求体不可读的异常
      * <p>
      * 当请求体不可读时，会抛出 HttpMessageNotReadableException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   请求体不可读异常
+     * @return 统一错误响应，提示请求体为空或具体字段类型错误
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -167,6 +208,7 @@ public class GlobalExceptionHandler {
         String errorMessage = "请求体不可为空";
         Throwable cause = e.getCause();
         if (cause != null) {
+            // 有底层 cause 时，尝试从异常文本中解析出具体字段名
             errorMessage = convertMessage(cause);
         }
         return Result.failed(errorMessage);
@@ -176,6 +218,10 @@ public class GlobalExceptionHandler {
      * 处理类型不匹配异常
      * <p>
      * 当方法参数类型不匹配时，会抛出 TypeMismatchException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   类型不匹配异常
+     * @return 统一错误响应，提示信息取异常消息
      */
     @ExceptionHandler(TypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -188,12 +234,17 @@ public class GlobalExceptionHandler {
      * 处理 SQL 语法错误异常
      * <p>
      * 当 SQL 语法错误时，会抛出 BadSqlGrammarException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   SQL 语法/权限异常
+     * @return 统一错误响应，演示环境写库被拒时返回友好提示
      */
     @ExceptionHandler(BadSqlGrammarException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public <T> Result<T> handleBadSqlGrammarException(BadSqlGrammarException e) {
         log.error(e.getMessage(), e);
         String errorMsg = e.getMessage();
+        // 演示环境数据库账号可能无写权限，单独转换为友好提示
         if (StrUtil.isNotBlank(errorMsg) && errorMsg.contains("denied to user")) {
             return Result.failed(ResultCode.DATABASE_ACCESS_DENIED);
         } else {
@@ -205,6 +256,10 @@ public class GlobalExceptionHandler {
      * 处理 SQL 语法错误异常
      * <p>
      * 当 SQL 语法错误时，会抛出 SQLSyntaxErrorException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   SQL 语法错误异常
+     * @return 统一错误响应，业务码为“数据库执行语法错误”
      */
     @ExceptionHandler(SQLSyntaxErrorException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
@@ -218,6 +273,10 @@ public class GlobalExceptionHandler {
      * 处理 SQL 违反了完整性约束
      * <p>
      * 当 SQL 违反了完整性约束时，会抛出 SQLIntegrityConstraintViolationException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   完整性约束异常（如唯一键冲突）
+     * @return 统一错误响应，业务码为“违反了完整性约束”
      */
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
@@ -230,11 +289,16 @@ public class GlobalExceptionHandler {
      * 处理业务异常
      * <p>
      * 当业务逻辑发生错误时，会抛出 BusinessException 异常。
+     *
+     * @param <T> 响应数据类型
+     * @param e   业务异常，可能携带响应码
+     * @return 统一错误响应，优先使用异常携带的响应码
      */
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public <T> Result<T> handleBizException(BusinessException e) {
         log.error("biz exception", e);
+        // 携带响应码时按业务码返回，否则回退为系统错误
         if (e.getResultCode() != null) {
             return Result.failed(e.getResultCode(), e.getMessage());
         }
@@ -245,9 +309,15 @@ public class GlobalExceptionHandler {
      * 处理所有未捕获的异常
      * <p>
      * 当发生未捕获的异常时，会抛出 Exception 异常。
+     * 对外只返回统一提示，完整堆栈写入服务端日志，避免泄露 SQL、类名等内部信息。
+     *
+     * @param <T> 响应数据类型
+     * @param e   未捕获的异常
+     * @return 统一错误响应
+     * @throws Exception 认证/鉴权异常原样抛出，交由 Spring Security 处理器处理
      */
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public <T> Result<T> handleException(Exception e) throws Exception {
         // 将 Spring Security 异常继续抛出，以便交给自定义处理器处理
         if (e instanceof AccessDeniedException
@@ -255,7 +325,7 @@ public class GlobalExceptionHandler {
             throw e;
         }
         log.error("unknown exception", e);
-        return Result.failed(e.getLocalizedMessage());
+        return Result.failed(ResultCode.SYSTEM_ERROR);
     }
 
     /**
@@ -266,16 +336,19 @@ public class GlobalExceptionHandler {
      */
     private String convertMessage(Throwable throwable) {
         String error = throwable.toString();
+        // 匹配异常信息中被 ["..."] 包裹的字段名，例如 ["age"]
         String regulation = "\\[\"(.*?)\"]+";
         Pattern pattern = Pattern.compile(regulation);
         Matcher matcher = pattern.matcher(error);
         String group = "";
         if (matcher.find()) {
             String matchString = matcher.group();
+            // 去掉方括号和引号，得到纯字段名
             matchString = matchString.replace("[", "").replace("]", "");
             matchString = "%s字段类型错误".formatted(matchString.replaceAll("\"", ""));
             group += matchString;
         }
+        // 未匹配到字段名时返回空串，由调用方决定最终提示
         return group;
     }
 }

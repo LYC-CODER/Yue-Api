@@ -12,6 +12,8 @@ import java.util.List;
 
 
 /**
+* 部门业务接口，负责部门树查询、维护及下拉选项。
+*
 * @author LYCorder
 * @description 针对表【sys_dept(部门管理表)】的数据库操作Service
 * @createDate 2026-01-23 19:26:46

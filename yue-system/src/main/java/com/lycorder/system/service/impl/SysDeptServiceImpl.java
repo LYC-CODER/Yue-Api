@@ -26,6 +26,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+* 部门业务实现，负责部门树构建、维护及级联删除。
+*
 * @author LYCorder
 * @description 针对表【sys_dept(部门管理表)】的数据库操作Service实现
 * @createDate 2026-01-23 19:26:46
@@ -213,6 +215,13 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
         return sysDeptConverter.toForm(entity);
     }
 
+    /**
+     * 修改部门信息，并重新生成部门树路径。
+     *
+     * @param deptId   部门ID
+     * @param formData 部门表单数据
+     * @return 修改后的部门ID
+     */
     @Override
     public Long updateDept(Long deptId, DeptForm formData) {
         // 校验部门名称/部门编号是否存在
@@ -239,11 +248,18 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept>
         return entity.getId();
     }
 
+    /**
+     * 批量逻辑删除部门及其子部门。
+     *
+     * @param ids 部门ID字符串，多个以英文逗号分隔
+     * @return 是否删除成功
+     */
     @Override
     public boolean deleteByIds(String ids) {
 
         // 删除部门及子部门
         if (StrUtil.isNotBlank(ids)) {
+            // 逐个部门删除，并通过 tree_path 同时命中其子部门
             String[] menuIds = ids.split(",");
             for (String deptId : menuIds) {
                 String patten = "%," + deptId + ",%";

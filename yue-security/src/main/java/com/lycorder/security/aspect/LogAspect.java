@@ -33,6 +33,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * 日志切面
@@ -48,8 +49,26 @@ import java.util.Objects;
 @Component
 @RequiredArgsConstructor
 public class LogAspect {
+
+    /**
+     * 日志中的敏感字段，序列化后统一替换为 ******，避免密码/令牌落库
+     */
+    private static final Pattern SENSITIVE_FIELD_PATTERN = Pattern.compile(
+            "(\"(?:password|oldPassword|newPassword|confirmPassword|token|accessToken|refreshToken|secret|secretKey)\"\\s*:\\s*\")([^\"]*)(\")",
+            Pattern.CASE_INSENSITIVE
+    );
+
+    /**
+     * 事件发布器，将日志事件交给业务模块的监听器持久化
+     */
     private final ApplicationEventPublisher eventPublisher;
+    /**
+     * 当前请求对象，用于采集请求 URI、IP、User-Agent 等信息
+     */
     private final HttpServletRequest request;
+    /**
+     * 缓存管理器，用于缓存 User-Agent 解析结果
+     */
     private final CacheManager cacheManager;
 
     /**
@@ -60,9 +79,12 @@ public class LogAspect {
     }
 
     /**
-     * 处理完请求后执行
+     * 环绕目标方法执行，采集执行时长、结果或异常并发布操作日志。
      *
-     * @param joinPoint 切点
+     * @param joinPoint     切点
+     * @param logAnnotation 目标方法上的日志注解
+     * @return 目标方法的执行结果
+     * @throws Throwable 目标方法抛出的异常，原样向上传递
      */
     @Around("logPointcut() && @annotation(logAnnotation)")
     public Object doAround(ProceedingJoinPoint joinPoint, com.lycorder.common.annotation.Log logAnnotation) throws Throwable {
@@ -80,6 +102,7 @@ public class LogAspect {
             throw e;
         } finally {
             long executionTime = timer.interval(); // 执行时长
+            // 无论业务方法成功还是失败，都发布日志事件；异常仍会继续向上抛出
             this.publishLog(joinPoint, exception, result, logAnnotation, executionTime, userId);
         }
         return result;
@@ -93,6 +116,7 @@ public class LogAspect {
      * @param e             异常
      * @param jsonResult    响应结果
      * @param logAnnotation 日志注解
+     * @param executionTime 方法执行耗时（毫秒）
      * @param userId        用户ID
      */
     private void publishLog(final JoinPoint joinPoint, final Exception e, Object jsonResult, com.lycorder.common.annotation.Log logAnnotation, long executionTime, Long userId) {
@@ -100,6 +124,7 @@ public class LogAspect {
         // 创建日志事件
         LogEvent log = new LogEvent();
         log.setExecutionTime(executionTime);
+        // 无日志注解但存在异常时，按系统异常记录堆栈信息
         if (logAnnotation == null && e != null) {
             log.setModule(LogModuleEnum.EXCEPTION);
             log.setContent("系统发生异常");
@@ -114,7 +139,7 @@ public class LogAspect {
             }
             // 响应结果
             if (logAnnotation.result() && jsonResult != null) {
-                log.setResponseContent(JSONUtil.toJsonStr(jsonResult));
+                log.setResponseContent(maskSensitive(JSONUtil.toJsonStr(jsonResult)));
             }
         }
         log.setRequestUri(requestURI);
@@ -162,16 +187,29 @@ public class LogAspect {
         log.setRequestMethod(requestMethod);
         if (HttpMethod.GET.name().equalsIgnoreCase(requestMethod) || HttpMethod.PUT.name().equalsIgnoreCase(requestMethod) || HttpMethod.POST.name().equalsIgnoreCase(requestMethod)) {
             String params = convertArgumentsToString(joinPoint.getArgs());
-            log.setRequestParams(StrUtil.sub(params, 0, 65535));
+            log.setRequestParams(StrUtil.sub(maskSensitive(params), 0, 65535));
         } else {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes != null) {
                 Map<?, ?> paramsMap = (Map<?, ?>) attributes.getRequest().getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-                log.setRequestParams(StrUtil.sub(paramsMap.toString(), 0, 65535));
+                log.setRequestParams(StrUtil.sub(maskSensitive(paramsMap.toString()), 0, 65535));
             } else {
                 log.setRequestParams("");
             }
         }
+    }
+
+    /**
+     * 对 JSON 字符串中的密码、Token 等敏感字段做脱敏。
+     *
+     * @param content 原始内容
+     * @return 脱敏后的内容
+     */
+    private String maskSensitive(String content) {
+        if (StrUtil.isBlank(content)) {
+            return content;
+        }
+        return SENSITIVE_FIELD_PATTERN.matcher(content).replaceAll("$1******$3");
     }
 
     /**
